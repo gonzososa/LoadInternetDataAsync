@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -22,7 +23,15 @@ import android.widget.ListView;
 
 import com.jakewharton.disklrucache.DiskLruCache;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+
 import java.io.File;
+import java.io.FilterInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
@@ -60,7 +69,7 @@ public class MainActivity extends Activity {
         memCache = new LruCache<String, Bitmap>(cacheSize);
 
         File cacheDir = getDiskCacheDir (this, DISK_CACHE_SUBDIR);
-        diskCache = DiskLruCache.open (cacheDir);
+        //diskCache = DiskLruCache.open (cacheDir);
 
         final ListView listView1 = (ListView) findViewById (R.id.listView1);
 
@@ -129,7 +138,7 @@ public class MainActivity extends Activity {
         @Override
         protected Bitmap doInBackground (String...urls) {
             url = String.valueOf (urls [0]);
-            return loadImageFromNetwork (url);
+            return downloadBitmap(url);
         }
 
         @Override
@@ -151,7 +160,71 @@ public class MainActivity extends Activity {
             super.onPostExecute (result);
         }
 
-        private Bitmap loadImageFromNetwork (String url) {
+        private Bitmap downloadBitmap (String url) {
+            final int IO_BUFFER_SIZE = 1024 * 4;
+            final HttpClient client = AndroidHttpClient.newInstance ("Android");
+            final HttpGet getRequest = new HttpGet (url);
+
+            try {
+                HttpResponse response = client.execute (getRequest);
+                final int statusCode = response.getStatusLine().getStatusCode ();
+
+                if (statusCode != HttpStatus.SC_OK) {
+                    return null;
+                }
+
+                final HttpEntity entity  = response.getEntity ();
+                if (entity != null) {
+                    InputStream inputStream = null;
+                    try {
+                        inputStream = entity.getContent ();
+
+                        return scaleImage (BitmapFactory.decodeStream (new FilterInputStream (inputStream) {
+                            @Override
+                            public long skip (long n) throws IOException {
+                                long totalBytesSkipped = 0L;
+
+                                while (totalBytesSkipped < n) {
+                                    long bytesSkipped = in.skip (n - totalBytesSkipped);
+                                    if (bytesSkipped == 0L) {
+                                        int b = read ();
+                                        if (b < 0)
+                                            break;
+                                        else
+                                            bytesSkipped = 1;
+                                    }
+                                    totalBytesSkipped += bytesSkipped;
+                                }
+
+                                return totalBytesSkipped;
+                            }
+                            }), 100, 100);
+
+                    } finally {
+                        if (inputStream != null) {
+                            inputStream.close ();
+                        }
+
+                        entity.consumeContent ();
+                    }
+                }
+            } catch (IOException e) {
+                getRequest.abort ();
+            }
+            catch (IllegalStateException e) {
+                getRequest.abort ();
+            }
+            catch (Exception e) {
+                getRequest.abort ();
+            }
+            finally {
+                ((AndroidHttpClient) client).close ();
+            }
+
+            return null;
+        }
+
+        /*private Bitmap loadImageFromNetwork (String url) {
             Bitmap bitmap = null;
 
             try {
@@ -163,13 +236,13 @@ public class MainActivity extends Activity {
             }
 
             return scaleImage (bitmap, 200, 200);
-        }
+        }*/
 
-        private Bitmap decodeSampledBitmapFromNetwork (Bitmap bitmap, int reqWidth, int reqHeight) {
+        /*private Bitmap decodeSampledBitmapFromNetwork (Bitmap bitmap, int reqWidth, int reqHeight) {
             BitmapFactory.Options options = new BitmapFactory.Options ();
             options.inJustDecodeBounds = true;
             return null;
-        }
+        }*/
 
         /*private ImageBounds decodeBounds (InputStream stream) {
             ImageBounds bounds = new ImageBounds ();
@@ -181,15 +254,25 @@ public class MainActivity extends Activity {
         }*/
 
         private Bitmap scaleImage (Bitmap bitmap, int width, int height) {
-            return Bitmap.createScaledBitmap (bitmap, width, height, true);
+            int oWIdth = bitmap.getWidth ();
+            int oHeight = bitmap.getHeight ();
+
+            if (oWIdth > oHeight) {
+                height = (int) (((double) oHeight / (double) oWIdth) * height);
+            } else if (oHeight > oWIdth) {
+                width = (int) (((double) oWIdth / (double) oHeight) * width);
+            }
+
+            return Bitmap.createScaledBitmap (bitmap, width, height, false);
         }
     }
 
     public File getDiskCacheDir (Context context, String uniqueName) {
-        String cachePath =
-                Environment.MEDIA_MOUNTED.equals (Environment.getExternalStorageState ()) ||
-                        !isExternalStorageRemovable () ? getExternalCacheDir(context).getPath () :
-                        context.getCacheDir().getPath();
+        //String cachePath =
+        //        Environment.MEDIA_MOUNTED.equals (Environment.getExternalStorageState ()) ||
+        //                !Environment.isExternalStorageRemovable() ? getExternalCacheDir().getPath () :
+        //                context.getCacheDir().getPath();
+        return null;
     }
 
     /*class ImageBounds {
