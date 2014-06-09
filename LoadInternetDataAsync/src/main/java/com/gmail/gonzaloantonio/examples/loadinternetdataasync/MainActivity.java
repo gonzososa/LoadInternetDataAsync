@@ -22,15 +22,14 @@ import com.jakewharton.disklrucache.DiskLruCache;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class MainActivity extends Activity {
-    //private ImageView img;
     private String [] urls = {
             "https://pbs.twimg.com/profile_images/462981550003740672/Jb-UpOux.jpeg",
             "https://pbs.twimg.com/media/BoHECEXIgAEwrDi.jpg:large",
@@ -91,7 +90,6 @@ public class MainActivity extends Activity {
 
         final ListView listView1 = (ListView) findViewById (R.id.listView1);
 
-
         Button button = (Button) findViewById (R.id.button1);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,12 +107,6 @@ public class MainActivity extends Activity {
                         img = (ImageView) convertView;
                     }
 
-                    /*LayoutInflater inflater = (LayoutInflater) getContext().getSystemService (Context.LAYOUT_INFLATER_SERVICE);
-                    View listItem = inflater.inflate (R.layout.list_item, parent, false);
-                    ImageView img = (ImageView) listItem.findViewById (R.id.imageView1);
-
-                    new DownloadImageTask(img).execute (urls [position]);*/
-                    //Log.i("JENSELTER", "URL: " + urls[position]);
                     String key = urls[position];
                     Bitmap b = getBitmapFromMemCache (key);
                     if (b != null) {
@@ -123,7 +115,7 @@ public class MainActivity extends Activity {
                         if (cancelPotentialDownload (key, img)) {
                             DownloadImageTask task = new DownloadImageTask (img);
                             img.setImageDrawable (new DefaultDrawable (task));
-                            task.execute (urls[position]);
+                            task.execute (urls [position]);
                         }
                     }
 
@@ -201,85 +193,46 @@ public class MainActivity extends Activity {
         }
 
         private Bitmap downloadBitmap (String uri) {
-            //final int IO_BUFFER_SIZE = 1024 * 4;
-            //final HttpClient client = AndroidHttpClient.newInstance ("Android");
-            //final HttpGet getRequest = new HttpGet (url);
-
             try {
                 URL url = new URL (uri);
                 HttpURLConnection client = (HttpURLConnection) url.openConnection ();
-                //HttpResponse response = client.execute (getRequest);
-                final int statusCode = client.getResponseCode (); //response.getStatusLine().getStatusCode ();
-
+                final int statusCode = client.getResponseCode ();
+                Log.i ("JENSELTER", uri + "->" + statusCode);
                 if (statusCode != 200) {
-                    //.i ("JENSELTER", "Status Error: " + statusCode);
                     return null;
                 }
 
-                //final HttpEntity entity  = response.getEntity ();
-                //if (entity != null) {
-                    InputStream inputStream = null;
-                    BufferedInputStream buffer;
+                InputStream inputStream = null;
+                BufferedInputStream buffer;
+                int BUFFER_SIZE = 16 * 1024;
 
-                    try {
-                        //inputStream = entity.getContent ();
-                        inputStream = client.getInputStream ();
-                        buffer = new BufferedInputStream (new FlushedInputStream (inputStream));
-                        BitmapFactory.Options options = new BitmapFactory.Options ();
-                        options.inJustDecodeBounds = true;
-                        BitmapFactory.decodeStream (buffer, null, options);
-                        options.inSampleSize = calculateInSampleSize (options, 150, 150);
-                        options.inJustDecodeBounds = false;
-                        //return scaleImage (BitmapFactory.decodeStream (inputStream), 100, 100);
-                        buffer.reset ();
-                        return scaleImage (BitmapFactory.decodeStream (buffer, null, options), 150, 150);
+                try {
+                    inputStream = client.getInputStream ();
+                    buffer = new BufferedInputStream (new FlushedInputStream (inputStream), BUFFER_SIZE);
+                    buffer.mark (BUFFER_SIZE);
 
-                        /*return scaleImage (BitmapFactory.decodeStream (new FilterInputStream (inputStream) {
-                            @Override
-                            public long skip (long n) throws IOException {
-                                long totalBytesSkipped = 0L;
+                    BitmapFactory.Options options = new BitmapFactory.Options ();
+                    options.inJustDecodeBounds = true;
+                    BitmapFactory.decodeStream (buffer, null, options);
+                    options.inPreferredConfig = Bitmap.Config.RGB_565;
+                    options.inSampleSize = calculateInSampleSize (options, 150, 150);
+                    options.inJustDecodeBounds = false;
 
-                                while (totalBytesSkipped < n) {
-                                    long bytesSkipped = in.skip (n - totalBytesSkipped);
-                                    if (bytesSkipped == 0L) {
-                                        int b = read ();
-                                        if (b < 0)
-                                            break;
-                                        else
-                                            bytesSkipped = 1;
-                                    }
-                                    totalBytesSkipped += bytesSkipped;
-                                }
-
-                                return totalBytesSkipped;
-                            }
-                            }, null, options), 150, 150);*/
-
-                    } finally {
-                        if (inputStream != null) {
-                            inputStream.close ();
-                            inputStream = null;
-                        }
-
-                        client.disconnect ();
-                        client = null;
-                        //entity.consumeContent ();
+                    buffer.reset ();
+                    return scaleImage (BitmapFactory.decodeStream (buffer, null, options), 150, 150);
+                } finally {
+                    if (inputStream != null) {
+                        inputStream.close ();
+                        inputStream = null;
                     }
-                //}
+
+                    client.disconnect ();
+                    client = null;
+                }
+            } catch (MalformedURLException e) {
+                Log.i ("JENSELTER", "Error Message:" + e.toString ());
             } catch (IOException e) {
-                //getRequest.abort ();
-                //Log.i ("JENSELTER", "Error Message: " + e.toString ());
-            }
-            catch (IllegalStateException e) {
-                //getRequest.abort ();
-                //Log.i ("JENSELTER", "Error Message:" + e.toString ());
-            }
-            catch (Exception e) {
-                //getRequest.abort ();
-                //Log.i ("JENSELTER", "Error Message: " + e.toString ());
-            }
-            finally {
-                //((AndroidHttpClient) client).close ();
+                Log.i ("JENSELTER", "Error Message: " + e.toString ());
             }
 
             return null;
@@ -299,38 +252,8 @@ public class MainActivity extends Activity {
                 }
             }
 
-            Log.i ("JENSELTER", String.valueOf (inSampleSize));
             return inSampleSize;
         }
-
-        /*private Bitmap loadImageFromNetwork (String url) {
-            Bitmap bitmap = null;
-
-            try {
-                URL u = new URL (url);
-                InputStream inputStream = (InputStream) u.getContent ();
-                bitmap =  BitmapFactory.decodeStream (inputStream);
-            } catch (Exception ex) {
-                ex.printStackTrace ();
-            }
-
-            return scaleImage (bitmap, 200, 200);
-        }*/
-
-        /*private Bitmap decodeSampledBitmapFromNetwork (Bitmap bitmap, int reqWidth, int reqHeight) {
-            BitmapFactory.Options options = new BitmapFactory.Options ();
-            options.inJustDecodeBounds = true;
-            return null;
-        }*/
-
-        /*private ImageBounds decodeBounds (InputStream stream) {
-            ImageBounds bounds = new ImageBounds ();
-            BitmapFactory.Options options = new BitmapFactory.Options ();
-            options.inJustDecodeBounds = true;
-            bounds.setWidth (options.outWidth);
-            bounds.setHeight (options.outHeight);
-            return bounds;
-        }*/
 
         private Bitmap scaleImage (Bitmap bitmap, int width, int height) {
             int oWIdth = bitmap.getWidth ();
@@ -368,25 +291,4 @@ public class MainActivity extends Activity {
             return downloadTask != null ? downloadTask.get () : null;
         }
     }
-
-    /*class ImageBounds {
-        private int height;
-        private int width;
-
-        public int getHeigth () {
-            return height;
-        }
-
-        public int getWidth () {
-            return width;
-        }
-
-        public void setHeight (int value) {
-            height = value;
-        }
-
-        public void setWidth (int value) {
-            width = value;
-        }
-    }*/
 }
