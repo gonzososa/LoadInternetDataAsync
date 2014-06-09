@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pre-dex-items>
+
+    <item
+        dex="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\pre-dexed\debug\support-v4-19.1.0-72aac739eb325ff30f32259efecb3d01c8b45ccd.jar"
+        jar="C:\Users\Gonzalo\AppData\Local\Android\android-studio\sdk\extras\android\m2repository\com\android\support\support-v4\19.1.0\support-v4-19.1.0.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67"/>
+    <item
+        dex="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\pre-dexed\debug\disklrucache-2.0.2-c8d0a55298744b9f19fc9f0b4d1daf60921221c8.jar"
+        jar="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\libs\disklrucache-2.0.2.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="93b399470e72c0bc8cb52379943b63c9aa586cd8"/>
+    <item
+        dex="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\pre-dexed\debug\classes-9eb682b9e8180ebc55333babc1e1209291e97856.jar"
+        jar="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\build\intermediates\exploded-aar\com.android.support\appcompat-v7\19.1.0\classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="3499ceba05ca1f6037c6a2fad73df8f636224a28"/>
+
+</pre-dex-items>
