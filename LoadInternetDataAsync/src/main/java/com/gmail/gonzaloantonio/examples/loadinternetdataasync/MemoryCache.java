@@ -10,7 +10,12 @@ public class MemoryCache {
     static {
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         final int cacheSize = maxMemory / 8;
-        memCache = new LruCache<String, Bitmap>(cacheSize);
+        memCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf (String key, Bitmap value) {
+                return getBitmapBytesCount (value) / 1024;
+            }
+        };
         Log.i("JENSELTER", "Cache size: " + memCache);
     }
 
@@ -24,5 +29,9 @@ public class MemoryCache {
 
     public static Bitmap getBitmapFromMemoryCache (String key) {
         return memCache.get (key);
+    }
+
+    private static int getBitmapBytesCount (Bitmap bitmap) {
+        return bitmap.getRowBytes () * bitmap.getHeight ();
     }
 }

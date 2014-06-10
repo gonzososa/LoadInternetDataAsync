@@ -1,6 +1,7 @@
 package com.gmail.gonzaloantonio.examples.loadinternetdataasync;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 //import android.graphics.BitmapFactory;
@@ -17,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.jakewharton.disklrucache.DiskLruCache;
 
@@ -81,10 +83,6 @@ public class MainActivity extends Activity {
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_main);
-
-        /*final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-        final int cacheSize = maxMemory / 8;
-        memCache = new LruCache<String, Bitmap>(cacheSize);*/
 
         File cacheDir = getDiskCacheDir (this, DISK_CACHE_SUBDIR);
         //diskCache = DiskLruCache.open (cacheDir);
