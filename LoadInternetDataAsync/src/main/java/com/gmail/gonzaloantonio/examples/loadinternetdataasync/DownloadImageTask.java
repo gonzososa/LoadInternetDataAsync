@@ -48,9 +48,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     }
 
     private void addBitmapToMemoryCache (String key, Bitmap bitmap) {
-        if (MemoryCache.getBitmapFromMemoryCache (key) == null) {
-            MemoryCache.addBitmapToMemoryCache (key, bitmap);
-        }
+        MemoryCache.addBitmapToMemoryCache (key, bitmap);
     }
 
     private Bitmap downloadBitmap (String uri) {

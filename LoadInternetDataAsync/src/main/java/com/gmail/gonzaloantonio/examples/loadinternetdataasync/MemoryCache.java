@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
 
 public class MemoryCache {
-    private static LruCache<String, Bitmap> memCache;
+    private static final LruCache<String, Bitmap> memCache;
 
     static {
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
@@ -13,7 +13,11 @@ public class MemoryCache {
     }
 
     public static void addBitmapToMemoryCache (String key, Bitmap bitmap) {
-        memCache.put (key, bitmap);
+        synchronized (memCache) {
+            if (getBitmapFromMemoryCache (key) == null) {
+                memCache.put(key, bitmap);
+            }
+        }
     }
 
     public static Bitmap getBitmapFromMemoryCache (String key) {
