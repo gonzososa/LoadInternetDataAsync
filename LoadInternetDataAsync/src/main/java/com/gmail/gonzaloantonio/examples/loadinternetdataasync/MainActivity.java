@@ -49,6 +49,7 @@ public class MainActivity extends Activity {
             "https://pbs.twimg.com/media/BkOpckpCcAA_70R.jpg:large",
             "https://pbs.twimg.com/media/BpkWF6gIcAAxM6l.jpg:large",
             "https://pbs.twimg.com/media/BpkKnBXIEAAHFDp.jpg:large",
+            "https://pbs.twimg.com/media/BpuHSuNCQAA2K1W.jpg:large",
             "https://pbs.twimg.com/media/BpkJvfCIAAILJc-.jpg:large",
             "https://pbs.twimg.com/media/BkOcfdJCcAEH0MG.jpg:large",
             "https://pbs.twimg.com/media/BkEoEADIEAA3obl.jpg:large",
@@ -110,6 +111,7 @@ public class MainActivity extends Activity {
                     String key = urls[position];
                     Bitmap b = getBitmapFromMemCache (key);
                     if (b != null) {
+                        Log.i ("JENSELTER", "Recovering image from mem cache: " + key);
                         img.setImageBitmap (b);
                     } else {
                         if (cancelPotentialDownload (key, img)) {
