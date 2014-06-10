@@ -3,13 +3,13 @@ package com.gmail.gonzaloantonio.examples.loadinternetdataasync;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+//import android.graphics.BitmapFactory;
+//import android.graphics.Color;
+//import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
+//import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.util.LruCache;
+//import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,14 +20,14 @@ import android.widget.ListView;
 
 import com.jakewharton.disklrucache.DiskLruCache;
 
-import java.io.BufferedInputStream;
+//import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+//import java.io.IOException;
+//import java.io.InputStream;
+//import java.lang.ref.WeakReference;
+//import java.net.HttpURLConnection;
+//import java.net.MalformedURLException;
+//import java.net.URL;
 
 public class MainActivity extends Activity {
     private String [] urls = {
@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
             "https://pbs.twimg.com/media/Bm4N-biIAAA1o57.jpg:large"
     };
 
-    private LruCache<String, Bitmap> memCache;
+    //private LruCache<String, Bitmap> memCache;
     private DiskLruCache diskCache;
 
     private final Object diskCacheLock = new Object ();
@@ -81,9 +81,9 @@ public class MainActivity extends Activity {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_main);
 
-        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        /*final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         final int cacheSize = maxMemory / 8;
-        memCache = new LruCache<String, Bitmap>(cacheSize);
+        memCache = new LruCache<String, Bitmap>(cacheSize);*/
 
         File cacheDir = getDiskCacheDir (this, DISK_CACHE_SUBDIR);
         //diskCache = DiskLruCache.open (cacheDir);
@@ -130,7 +130,7 @@ public class MainActivity extends Activity {
         DownloadImageTask task = getDownloadImageTask (imageView);
 
         if (task != null) {
-            String imageUrl = task.url;
+            String imageUrl = task.getURL ();
             if ((imageUrl == null) || (!imageUrl.equals (url))) {
                 Log.i ("JENSELTER", "Canceling task  for url: " + (imageUrl != null ? imageUrl : "URL Empty!!"));
                 task.cancel (true);
@@ -153,17 +153,19 @@ public class MainActivity extends Activity {
         return null;
     }
 
-    private void addBitmapToMemoryCache (String key, Bitmap bitmap) {
+    /*private void addBitmapToMemoryCache (String key, Bitmap bitmap) {
         if (getBitmapFromMemCache(key) != null) {
-            memCache.put (key, bitmap);
+            //memCache.put (key, bitmap);
+            MemoryCache.addBitmapToMemoryCache (key, bitmap);
         }
-    }
+    }*/
 
     public Bitmap getBitmapFromMemCache (String key)  {
-        return memCache.get (key);
+        //return memCache.get (key);
+        return MemoryCache.getBitmapFromMemoryCache (key);
     }
 
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+    /*private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         private final WeakReference<ImageView> imageViewWeakReference;
         private String url;
 
@@ -197,7 +199,7 @@ public class MainActivity extends Activity {
                 URL url = new URL (uri);
                 HttpURLConnection client = (HttpURLConnection) url.openConnection ();
                 final int statusCode = client.getResponseCode ();
-                Log.i ("JENSELTER", uri + "->" + statusCode);
+
                 if (statusCode != 200) {
                     return null;
                 }
@@ -269,7 +271,7 @@ public class MainActivity extends Activity {
             bitmap = null;
             return b;
         }
-    }
+    }*/
 
     public File getDiskCacheDir (Context context, String uniqueName) {
         //String cachePath =
@@ -279,7 +281,7 @@ public class MainActivity extends Activity {
         return null;
     }
 
-    private class DefaultDrawable extends ColorDrawable {
+    /*private class DefaultDrawable extends ColorDrawable {
         WeakReference<DownloadImageTask> downloadTask;
 
         public DefaultDrawable (DownloadImageTask task) {
@@ -290,5 +292,5 @@ public class MainActivity extends Activity {
         public DownloadImageTask getDownloadImageTask () {
             return downloadTask != null ? downloadTask.get () : null;
         }
-    }
+    }*/
 }
