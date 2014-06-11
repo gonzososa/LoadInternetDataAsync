@@ -28,7 +28,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
     @Override
     protected Bitmap doInBackground (String...urls) {
-        url = String.valueOf (urls [0]);
+        url = urls [0];
         return downloadBitmap (url);
     }
 
@@ -87,6 +87,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
                 client.disconnect ();
                 client = null;
+                uri = null;
             }
         } catch (MalformedURLException e) {
             Log.i("JENSELTER", "Error Message:" + e.toString());

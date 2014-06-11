@@ -4,7 +4,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-class FlushedInputStream extends FilterInputStream {
+public class FlushedInputStream extends FilterInputStream {
 
     public FlushedInputStream (InputStream inputStream) {
         super (inputStream);

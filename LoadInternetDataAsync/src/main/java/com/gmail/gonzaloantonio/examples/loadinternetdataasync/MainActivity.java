@@ -132,7 +132,6 @@ public class MainActivity extends Activity {
         if (task != null) {
             String imageUrl = task.getURL ();
             if ((imageUrl == null) || (!imageUrl.equals (url))) {
-                Log.i ("JENSELTER", "Canceling task  for url: " + (imageUrl != null ? imageUrl : "URL Empty!!"));
                 task.cancel (true);
             } else {
                 return false;
