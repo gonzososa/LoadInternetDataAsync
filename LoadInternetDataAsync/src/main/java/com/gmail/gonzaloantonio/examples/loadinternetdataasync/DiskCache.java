@@ -18,18 +18,16 @@ import java.io.OutputStream;
 
 public class DiskCache {
     private DiskLruCache diskCache;
-    private Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.JPEG;
-    private int compressQuality = 80;
-    private static final int APP_VERSION = 1;
-    private static final int VALUE_COUNT = 1;
-    private static final String TAG = "DiskCache";
+    private final Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.JPEG;
+    private final int compressQuality = 80;
+    private final int APP_VERSION = 1;
+    private final int VALUE_COUNT = 1;
+    private final String TAG = "DiskCache";
 
-    public DiskCache (Context context, String uniqueName, int diskCachesize, Bitmap.CompressFormat format, int quality) {
+    public DiskCache (Context context, String uniqueName, int diskCachesize) {
         try {
             final File diskCacheDir = getDiskCacheDir (context, uniqueName);
             diskCache = DiskLruCache.open (diskCacheDir, APP_VERSION, VALUE_COUNT, diskCachesize);
-            compressFormat = format;
-            compressQuality = quality;
             Log.i ("JENSELTER", diskCache.getDirectory().getPath());
         } catch (IOException e) {
             Log.i("JENSELTER", e.getMessage());

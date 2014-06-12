@@ -8,6 +8,9 @@ import android.os.Environment;
 import java.io.File;
 
 public class Utils {
+    public static DiskCache diskCache;
+    public static final String UniqueName = "thumbnails";
+    public static final int SizeOfCache = 1024 * 1024 * 10;
     public static final int IO_BUFFER_SIZE = 8 * 1024;
 
     public Utils () {}

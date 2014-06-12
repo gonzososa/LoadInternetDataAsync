@@ -29,6 +29,9 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     @Override
     protected Bitmap doInBackground (String...urls) {
         url = urls [0];
+        if (Utils.diskCache != null) {
+            Log.i ("JENSELTER", "Diskcache working!");
+        }
         return downloadBitmap (url);
     }
 

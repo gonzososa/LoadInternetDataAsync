@@ -66,8 +66,6 @@ public class MainActivity extends Activity {
             "https://pbs.twimg.com/media/Bm4N-biIAAA1o57.jpg:large"
     };
 
-    private DiskCache dc = null;
-
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
@@ -75,10 +73,12 @@ public class MainActivity extends Activity {
 
         final ListView listView1 = (ListView) findViewById (R.id.listView1);
 
-        //dc = new DiskCache (this, "thumbnails", (10 * 1024 * 1024), Bitmap.CompressFormat.JPEG, 90);
-        /*Foo f = new Foo (this, "thumbnails", (10 * 1024 * 1024), Bitmap.CompressFormat.JPEG, 90);
-        InitializeDiskCacheTask initializeDiskCache = new InitializeDiskCacheTask();
-        initializeDiskCache.execute(f);*/
+        new Runnable () {
+            @Override
+            public void run () {
+                Utils.diskCache = new DiskCache (getBaseContext(), Utils.UniqueName, Utils.SizeOfCache);
+            }
+        }.run ();
 
         Button button = (Button) findViewById (R.id.button1);
         button.setOnClickListener(new View.OnClickListener() {
@@ -156,11 +156,11 @@ public class MainActivity extends Activity {
         return MemoryCache.getBitmapFromMemoryCache (key);
     }
 
-    class InitializeDiskCacheTask extends AsyncTask<Foo, Void, Void> {
+    /*class InitializeDiskCacheTask extends AsyncTask<Foo, Void, Void> {
         @Override
         protected Void doInBackground (Foo...params) {
             Foo f = params [0];
-            dc = new DiskCache (f.getContext(), f.getUniqueName(), f.getSize(), f.getFormat(), f.getQuality());
+            dc = new DiskCache (f.getContext(), f.getUniqueName(), f.getSize()));
             return null;
         }
     }
@@ -201,7 +201,7 @@ public class MainActivity extends Activity {
         public int getQuality () {
             return  quality;
         }
-    }
+    }*/
 
     /*private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         private final WeakReference<ImageView> imageViewWeakReference;
