@@ -1,15 +1,12 @@
 package com.gmail.gonzaloantonio.examples.loadinternetdataasync;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Context;
 import android.graphics.Bitmap;
 //import android.graphics.BitmapFactory;
 //import android.graphics.Color;
 //import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 //import android.os.AsyncTask;
-import android.os.AsyncTask;
 import android.os.Bundle;
 //import android.support.v4.util.LruCache;
 import android.util.Log;
@@ -19,12 +16,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import com.jakewharton.disklrucache.DiskLruCache;
 
 //import java.io.BufferedInputStream;
-import java.io.File;
+
 
 public class MainActivity extends Activity {
     private String [] urls = {
@@ -76,7 +70,12 @@ public class MainActivity extends Activity {
         new Runnable () {
             @Override
             public void run () {
-                Utils.diskCache = new DiskCache (getBaseContext(), Utils.UniqueName, Utils.SizeOfCache);
+                synchronized (Utils.diskCacheLock) {
+                    Utils.diskCache = new DiskLRUCacheWrapper(getBaseContext (), Utils.UniqueName, Utils.SizeOfCache);
+                    Utils.diskCacheStarting = false;
+                    Utils.diskCacheLock.notifyAll ();
+                    Log.i ("JENSELTER", "Folder: " + Utils.diskCache.getCacheFolder());
+                }
             }
         }.run ();
 
@@ -101,14 +100,11 @@ public class MainActivity extends Activity {
                     cancelPotentialDownload (key, img);
                     Bitmap b = getBitmapFromMemCache (key);
                     if (b != null) {
-                        //Log.i ("JENSELTER", "Recovering image from mem cache: " + key);
                         img.setImageBitmap (b);
                     } else {
-                        //if (cancelPotentialDownload (key, img)) {
                         DownloadImageTask task = new DownloadImageTask (img);
                         img.setImageDrawable (new DefaultDrawable (task));
                         task.execute (urls [position]);
-                        //}
                     }
 
                     return img;

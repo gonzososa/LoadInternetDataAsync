@@ -29,9 +29,10 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     @Override
     protected Bitmap doInBackground (String...urls) {
         url = urls [0];
-        if (Utils.diskCache != null) {
-            Log.i ("JENSELTER", "Diskcache working!");
-        }
+
+        Bitmap bitmap = getBitmapFromDiskCache (url);
+        if (bitmap != null) return bitmap;
+
         return downloadBitmap (url);
     }
 
@@ -45,6 +46,9 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         if (imageView != null && result != null) {
             imageView.setImageBitmap (result);
             addBitmapToMemoryCache (url, result);
+            if (Utils.diskCache != null && !Utils.diskCache.containsKey (Utils.createMD5String (url))) {
+                addBitmapToDiskCache (url, result);
+            }
         }
 
         super.onPostExecute (result);
@@ -131,5 +135,33 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         Bitmap b = Bitmap.createScaledBitmap (bitmap, width, height, true);
         bitmap = null;
         return b;
+    }
+
+    private void addBitmapToDiskCache (String key, Bitmap bitmap) {
+        synchronized (Utils.diskCacheLock) {
+            key = Utils.createMD5String (key);
+            if (Utils.diskCache != null && !Utils.diskCache.containsKey (key)) {
+                Utils.diskCache.put (key, bitmap);
+            }
+        }
+    }
+
+    private Bitmap getBitmapFromDiskCache (String key) {
+        synchronized (Utils.diskCacheLock) {
+            while (Utils.diskCacheStarting) {
+                try {
+                    Utils.diskCacheLock.wait ();
+                } catch (InterruptedException e) {
+
+                }
+            }
+
+            key = Utils.createMD5String (key);
+            if (Utils.diskCache != null && Utils.diskCache.containsKey (key)) {
+                return Utils.diskCache.getBitmap (key);
+            }
+        }
+
+        return null;
     }
 }

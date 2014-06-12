@@ -16,19 +16,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class DiskCache {
-    private DiskLruCache diskCache;
+public class DiskLRUCacheWrapper {
+    private DiskLruCache mDiskLRUCache;
     private final Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.JPEG;
-    private final int compressQuality = 80;
+    private final int compressQuality = 100;
     private final int APP_VERSION = 1;
     private final int VALUE_COUNT = 1;
     private final String TAG = "DiskCache";
 
-    public DiskCache (Context context, String uniqueName, int diskCachesize) {
+    public DiskLRUCacheWrapper(Context context, String uniqueName, int diskCachesize) {
         try {
             final File diskCacheDir = getDiskCacheDir (context, uniqueName);
-            diskCache = DiskLruCache.open (diskCacheDir, APP_VERSION, VALUE_COUNT, diskCachesize);
-            Log.i ("JENSELTER", diskCache.getDirectory().getPath());
+            mDiskLRUCache = DiskLruCache.open (diskCacheDir, APP_VERSION, VALUE_COUNT, diskCachesize);
         } catch (IOException e) {
             Log.i("JENSELTER", e.getMessage());
         }
@@ -58,15 +57,15 @@ public class DiskCache {
         return new File (cachePath + File.separator + uniqueName);
     }
 
-    private void put (String key, Bitmap data) {
+    public void put (String key, Bitmap data) {
         DiskLruCache.Editor editor = null;
 
         try {
-            editor = diskCache.edit (key);
+            editor = mDiskLRUCache.edit (key);
             if (editor == null) return;
 
             if (writeBitmapToFile (data, editor)) {
-                diskCache.flush ();
+                mDiskLRUCache.flush();
                 editor.commit ();
             }
 
@@ -87,7 +86,7 @@ public class DiskCache {
         DiskLruCache.Snapshot snapshot = null;
 
         try {
-            snapshot = diskCache.get (key);
+            snapshot = mDiskLRUCache.get (key);
             if (snapshot == null) return null;
 
             final InputStream in = snapshot.getInputStream (0);
@@ -110,7 +109,7 @@ public class DiskCache {
         DiskLruCache.Snapshot snapshot = null;
 
         try {
-            snapshot = diskCache.get (key);
+            snapshot = mDiskLRUCache.get (key);
             contained = snapshot != null;
         } catch (IOException e) {
 
@@ -125,14 +124,14 @@ public class DiskCache {
 
     public void clearCache () {
         try {
-            diskCache.delete ();
+            mDiskLRUCache.delete();
         } catch (IOException e) {
 
         }
     }
 
     public File getCacheFolder () {
-        return diskCache.getDirectory ();
+        return mDiskLRUCache.getDirectory ();
     }
 
 }
