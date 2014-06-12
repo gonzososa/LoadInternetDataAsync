@@ -19,5 +19,11 @@
         jumboMode="false"
         revision="19.1.0"
         sha1="3499ceba05ca1f6037c6a2fad73df8f636224a28"/>
+    <item
+        dex="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\pre-dexed\debug\commons-io-2.4-65e100933fca7e113a94347a299548b4fb6e8c6b.jar"
+        jar="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\libs\commons-io-2.4.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="b1b6ea3b7e4aa4f492509a4952029cd8e48019ad"/>
 
 </pre-dex-items>

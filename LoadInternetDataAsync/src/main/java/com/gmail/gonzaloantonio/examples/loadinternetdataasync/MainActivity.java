@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 //import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 //import android.os.AsyncTask;
+import android.os.AsyncTask;
 import android.os.Bundle;
 //import android.support.v4.util.LruCache;
 import android.util.Log;
@@ -24,12 +25,6 @@ import com.jakewharton.disklrucache.DiskLruCache;
 
 //import java.io.BufferedInputStream;
 import java.io.File;
-//import java.io.IOException;
-//import java.io.InputStream;
-//import java.lang.ref.WeakReference;
-//import java.net.HttpURLConnection;
-//import java.net.MalformedURLException;
-//import java.net.URL;
 
 public class MainActivity extends Activity {
     private String [] urls = {
@@ -71,23 +66,19 @@ public class MainActivity extends Activity {
             "https://pbs.twimg.com/media/Bm4N-biIAAA1o57.jpg:large"
     };
 
-    //private LruCache<String, Bitmap> memCache;
-    private DiskLruCache diskCache;
-
-    private final Object diskCacheLock = new Object ();
-    private final boolean diskCacheStarting = true;
-    private static final int DISK_CACHE_SIZE = 1024 * 1024 * 10;
-    private static final String DISK_CACHE_SUBDIR = "thumbnails";
+    private DiskCache dc = null;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_main);
 
-        File cacheDir = getDiskCacheDir (this, DISK_CACHE_SUBDIR);
-        //diskCache = DiskLruCache.open (cacheDir);
-
         final ListView listView1 = (ListView) findViewById (R.id.listView1);
+
+        //dc = new DiskCache (this, "thumbnails", (10 * 1024 * 1024), Bitmap.CompressFormat.JPEG, 90);
+        /*Foo f = new Foo (this, "thumbnails", (10 * 1024 * 1024), Bitmap.CompressFormat.JPEG, 90);
+        InitializeDiskCacheTask initializeDiskCache = new InitializeDiskCacheTask();
+        initializeDiskCache.execute(f);*/
 
         Button button = (Button) findViewById (R.id.button1);
         button.setOnClickListener(new View.OnClickListener() {
@@ -107,16 +98,17 @@ public class MainActivity extends Activity {
                     }
 
                     String key = urls[position];
+                    cancelPotentialDownload (key, img);
                     Bitmap b = getBitmapFromMemCache (key);
                     if (b != null) {
-                        Log.i ("JENSELTER", "Recovering image from mem cache: " + key);
+                        //Log.i ("JENSELTER", "Recovering image from mem cache: " + key);
                         img.setImageBitmap (b);
                     } else {
-                        if (cancelPotentialDownload (key, img)) {
-                            DownloadImageTask task = new DownloadImageTask (img);
-                            img.setImageDrawable (new DefaultDrawable (task));
-                            task.execute (urls [position]);
-                        }
+                        //if (cancelPotentialDownload (key, img)) {
+                        DownloadImageTask task = new DownloadImageTask (img);
+                        img.setImageDrawable (new DefaultDrawable (task));
+                        task.execute (urls [position]);
+                        //}
                     }
 
                     return img;
@@ -162,6 +154,53 @@ public class MainActivity extends Activity {
     public Bitmap getBitmapFromMemCache (String key)  {
         //return memCache.get (key);
         return MemoryCache.getBitmapFromMemoryCache (key);
+    }
+
+    class InitializeDiskCacheTask extends AsyncTask<Foo, Void, Void> {
+        @Override
+        protected Void doInBackground (Foo...params) {
+            Foo f = params [0];
+            dc = new DiskCache (f.getContext(), f.getUniqueName(), f.getSize(), f.getFormat(), f.getQuality());
+            return null;
+        }
+    }
+
+    class Foo {
+        private Context context;
+        private String uniqueName;
+        private int size;
+        private Bitmap.CompressFormat format;
+        private int quality;
+
+        public String x;
+
+        public Foo (Context context, String uniqueName, int size, Bitmap.CompressFormat format, int quality) {
+            this.context = context;
+            this.uniqueName = uniqueName;
+            this.size = size;
+            this.format = format;
+            this.quality = quality;
+        }
+
+        public Context getContext () {
+            return context;
+        }
+
+        public String getUniqueName () {
+            return uniqueName;
+        }
+
+        public int getSize () {
+            return size;
+        }
+
+        public Bitmap.CompressFormat getFormat () {
+            return format;
+        }
+
+        public int getQuality () {
+            return  quality;
+        }
     }
 
     /*private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
@@ -272,13 +311,13 @@ public class MainActivity extends Activity {
         }
     }*/
 
-    public File getDiskCacheDir (Context context, String uniqueName) {
+    /*public File getDiskCacheDir (Context context, String uniqueName) {
         //String cachePath =
         //        Environment.MEDIA_MOUNTED.equals (Environment.getExternalStorageState ()) ||
         //                !Environment.isExternalStorageRemovable() ? getExternalCacheDir().getPath () :
         //                context.getCacheDir().getPath();
         return null;
-    }
+    }*/
 
     /*private class DefaultDrawable extends ColorDrawable {
         WeakReference<DownloadImageTask> downloadTask;
