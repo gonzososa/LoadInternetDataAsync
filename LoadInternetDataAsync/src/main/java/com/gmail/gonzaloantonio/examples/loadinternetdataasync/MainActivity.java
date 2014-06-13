@@ -1,12 +1,14 @@
 package com.gmail.gonzaloantonio.examples.loadinternetdataasync;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -103,6 +105,15 @@ public class MainActivity extends Activity {
             });
             }
         });
+
+        listView1.setOnItemClickListener (new AdapterView.OnItemClickListener () {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            Intent intent = new Intent (getBaseContext(), ZoomActivity.class);
+            intent.putExtra ("URL", (String) adapterView.getAdapter().getItem (i));
+            startActivity (intent);
+            }
+        });
     }
 
     private boolean cancelPotentialDownload (String url, ImageView imageView) {
@@ -132,7 +143,6 @@ public class MainActivity extends Activity {
     }
 
     public Bitmap getBitmapFromMemCache (String key)  {
-        //return memCache.get (key);
         return MemoryCache.getBitmapFromMemoryCache (key);
     }
 }

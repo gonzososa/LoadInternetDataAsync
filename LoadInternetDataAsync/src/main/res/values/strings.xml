@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">LoadInternetDataAsync</string>
     <string name="button1">Click me! Please</string>
+    <string name="zoom_activity_save">Save</string>
+    <string name="activity_zoom_label">ActivityZoom</string>
 </resources>
