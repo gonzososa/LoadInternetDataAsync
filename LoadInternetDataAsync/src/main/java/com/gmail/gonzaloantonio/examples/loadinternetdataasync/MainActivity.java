@@ -2,13 +2,8 @@ package com.gmail.gonzaloantonio.examples.loadinternetdataasync;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-//import android.graphics.BitmapFactory;
-//import android.graphics.Color;
-//import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-//import android.os.AsyncTask;
 import android.os.Bundle;
-//import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-
-//import java.io.BufferedInputStream;
-
 
 public class MainActivity extends Activity {
     private String [] urls = {
@@ -71,10 +63,9 @@ public class MainActivity extends Activity {
             @Override
             public void run () {
                 synchronized (Utils.diskCacheLock) {
-                    Utils.diskCache = new DiskLRUCacheWrapper(getBaseContext (), Utils.UniqueName, Utils.SizeOfCache);
+                    Utils.diskCache = new DiskLRUCacheWrapper (getBaseContext (), Utils.UniqueName, Utils.SizeOfCache);
                     Utils.diskCacheStarting = false;
                     Utils.diskCacheLock.notifyAll ();
-                    Log.i ("JENSELTER", "Folder: " + Utils.diskCache.getCacheFolder());
                 }
             }
         }.run ();
@@ -140,191 +131,8 @@ public class MainActivity extends Activity {
         return null;
     }
 
-    /*private void addBitmapToMemoryCache (String key, Bitmap bitmap) {
-        if (getBitmapFromMemCache(key) != null) {
-            //memCache.put (key, bitmap);
-            MemoryCache.addBitmapToMemoryCache (key, bitmap);
-        }
-    }*/
-
     public Bitmap getBitmapFromMemCache (String key)  {
         //return memCache.get (key);
         return MemoryCache.getBitmapFromMemoryCache (key);
     }
-
-    /*class InitializeDiskCacheTask extends AsyncTask<Foo, Void, Void> {
-        @Override
-        protected Void doInBackground (Foo...params) {
-            Foo f = params [0];
-            dc = new DiskCache (f.getContext(), f.getUniqueName(), f.getSize()));
-            return null;
-        }
-    }
-
-    class Foo {
-        private Context context;
-        private String uniqueName;
-        private int size;
-        private Bitmap.CompressFormat format;
-        private int quality;
-
-        public String x;
-
-        public Foo (Context context, String uniqueName, int size, Bitmap.CompressFormat format, int quality) {
-            this.context = context;
-            this.uniqueName = uniqueName;
-            this.size = size;
-            this.format = format;
-            this.quality = quality;
-        }
-
-        public Context getContext () {
-            return context;
-        }
-
-        public String getUniqueName () {
-            return uniqueName;
-        }
-
-        public int getSize () {
-            return size;
-        }
-
-        public Bitmap.CompressFormat getFormat () {
-            return format;
-        }
-
-        public int getQuality () {
-            return  quality;
-        }
-    }*/
-
-    /*private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        private final WeakReference<ImageView> imageViewWeakReference;
-        private String url;
-
-        public DownloadImageTask (ImageView img) {
-            imageViewWeakReference = new WeakReference<ImageView>(img);
-        }
-
-        @Override
-        protected Bitmap doInBackground (String...urls) {
-            url = String.valueOf (urls [0]);
-            return downloadBitmap (url);
-        }
-
-        @Override
-        protected void onPostExecute (Bitmap result) {
-            if (isCancelled ()) {
-                result = null;
-            }
-
-            ImageView imageView = imageViewWeakReference.get ();
-            if (imageView != null && result != null) {
-                imageView.setImageBitmap (result);
-                addBitmapToMemoryCache (url, result);
-            }
-
-            super.onPostExecute (result);
-        }
-
-        private Bitmap downloadBitmap (String uri) {
-            try {
-                URL url = new URL (uri);
-                HttpURLConnection client = (HttpURLConnection) url.openConnection ();
-                final int statusCode = client.getResponseCode ();
-
-                if (statusCode != 200) {
-                    return null;
-                }
-
-                InputStream inputStream = null;
-                BufferedInputStream buffer;
-                int BUFFER_SIZE = 16 * 1024;
-
-                try {
-                    inputStream = client.getInputStream ();
-                    buffer = new BufferedInputStream (new FlushedInputStream (inputStream), BUFFER_SIZE);
-                    buffer.mark (BUFFER_SIZE);
-
-                    BitmapFactory.Options options = new BitmapFactory.Options ();
-                    options.inJustDecodeBounds = true;
-                    BitmapFactory.decodeStream (buffer, null, options);
-                    options.inPreferredConfig = Bitmap.Config.RGB_565;
-                    options.inSampleSize = calculateInSampleSize (options, 150, 150);
-                    options.inJustDecodeBounds = false;
-
-                    buffer.reset ();
-                    return scaleImage (BitmapFactory.decodeStream (buffer, null, options), 150, 150);
-                } finally {
-                    if (inputStream != null) {
-                        inputStream.close ();
-                        inputStream = null;
-                    }
-
-                    client.disconnect ();
-                    client = null;
-                }
-            } catch (MalformedURLException e) {
-                Log.i ("JENSELTER", "Error Message:" + e.toString ());
-            } catch (IOException e) {
-                Log.i ("JENSELTER", "Error Message: " + e.toString ());
-            }
-
-            return null;
-        }
-
-        private int calculateInSampleSize (BitmapFactory.Options options, int reqWidth, int reqHeight) {
-            final int height = options.outHeight;
-            final int width = options.outWidth;
-            int inSampleSize = 1;
-
-            if (height > reqHeight || width > reqWidth) {
-                final int halfHeight = height / 2;
-                final int halfWidth = width / 2;
-
-                while (((halfHeight / inSampleSize) > reqHeight) && ((halfWidth / inSampleSize) > reqWidth)) {
-                    inSampleSize *= 2;
-                }
-            }
-
-            return inSampleSize;
-        }
-
-        private Bitmap scaleImage (Bitmap bitmap, int width, int height) {
-            int oWIdth = bitmap.getWidth ();
-            int oHeight = bitmap.getHeight ();
-
-            if (oWIdth > oHeight) {
-                height = (int) (((double) oHeight / (double) oWIdth) * height);
-            } else if (oHeight > oWIdth) {
-                width = (int) (((double) oWIdth / (double) oHeight) * width);
-            }
-
-            Bitmap b = Bitmap.createScaledBitmap (bitmap, width, height, true);
-            bitmap = null;
-            return b;
-        }
-    }*/
-
-    /*public File getDiskCacheDir (Context context, String uniqueName) {
-        //String cachePath =
-        //        Environment.MEDIA_MOUNTED.equals (Environment.getExternalStorageState ()) ||
-        //                !Environment.isExternalStorageRemovable() ? getExternalCacheDir().getPath () :
-        //                context.getCacheDir().getPath();
-        return null;
-    }*/
-
-    /*private class DefaultDrawable extends ColorDrawable {
-        WeakReference<DownloadImageTask> downloadTask;
-
-        public DefaultDrawable (DownloadImageTask task) {
-            super (Color.BLACK);
-            downloadTask = new WeakReference<DownloadImageTask> (task);
-        }
-
-        public DownloadImageTask getDownloadImageTask () {
-            return downloadTask != null ? downloadTask.get () : null;
-        }
-    }*/
 }

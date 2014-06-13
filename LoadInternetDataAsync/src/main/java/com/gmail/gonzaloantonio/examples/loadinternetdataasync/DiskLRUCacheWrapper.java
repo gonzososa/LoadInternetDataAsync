@@ -29,7 +29,7 @@ public class DiskLRUCacheWrapper {
             final File diskCacheDir = getDiskCacheDir (context, uniqueName);
             mDiskLRUCache = DiskLruCache.open (diskCacheDir, APP_VERSION, VALUE_COUNT, diskCachesize);
         } catch (IOException e) {
-            Log.i("JENSELTER", e.getMessage());
+            //Log.i("JENSELTER", e.getMessage());
         }
     }
 

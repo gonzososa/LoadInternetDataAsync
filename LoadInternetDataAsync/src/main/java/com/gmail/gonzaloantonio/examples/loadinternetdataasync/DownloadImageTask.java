@@ -97,9 +97,9 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
                 uri = null;
             }
         } catch (MalformedURLException e) {
-            Log.i("JENSELTER", "Error Message:" + e.toString());
+            //Log.i("JENSELTER", "Error Message:" + e.toString());
         } catch (IOException e) {
-            Log.i ("JENSELTER", "Error Message: " + e.toString ());
+            //Log.i ("JENSELTER", "Error Message: " + e.toString ());
         }
 
         return null;
