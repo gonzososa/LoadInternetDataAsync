@@ -1,17 +1,21 @@
 package com.gmail.gonzaloantonio.examples.loadinternetdataasync;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class ZoomActivity extends ActionBarActivity {
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -21,14 +25,22 @@ public class ZoomActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled (true);
         getSupportActionBar().setHomeButtonEnabled (true);
 
-        ImageView img = new ImageView (this);
-        img.setBackgroundColor (Color.WHITE);
-        img.setPadding (7, 7, 7, 7);
+        ImageView img = new TouchImageView (this);
+        img.setBackgroundColor (Color.BLACK);
 
+        progressBar = new ProgressBar (this);
+
+        supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        setSupportProgressBarIndeterminateVisibility (true);
         setContentView (img);
 
         Intent intent  = getIntent ();
         img.setImageBitmap(MemoryCache.getBitmapFromMemoryCache(intent.getStringExtra ("URL")));
+    }
+
+    @Override
+    public void onStart () {
+
     }
 
     @Override
@@ -46,6 +58,13 @@ public class ZoomActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected (item);
+    }
+
+    class l implements View.OnTouchListener {
+        @Override
+        public boolean onTouch (View view, MotionEvent event) {
+            return true;
+        }
     }
 
 }
