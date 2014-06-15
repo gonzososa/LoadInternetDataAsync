@@ -10,17 +10,19 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class ZoomActivity extends ActionBarActivity {
-    MenuItem menuItem;
+    Menu mMenu;
     String url;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
+        supportRequestWindowFeature (Window.FEATURE_INDETERMINATE_PROGRESS);
 
         getSupportActionBar().setHomeAsUpIndicator (0);
         getSupportActionBar().setDisplayHomeAsUpEnabled (true);
@@ -32,18 +34,18 @@ public class ZoomActivity extends ActionBarActivity {
         img.setBackgroundColor (Color.BLACK);
 
         setContentView (img);
+        setSupportProgressBarIndeterminateVisibility (true);
 
         Intent intent  = getIntent ();
         url = intent.getStringExtra ("URL");
         img.setImageBitmap (MemoryCache.getBitmapFromMemoryCache (url));
 
-        new DownloadFullImageTask(this).execute (url);
+        //new DownloadFullImageTask(this).execute (url);
     }
 
     @Override
     public boolean onCreateOptionsMenu (Menu menu) {
         getMenuInflater().inflate (R.menu.zoom_activity, menu);
-        menuItem = (MenuItem) findViewById (R.id.refresh);
         return super.onCreateOptionsMenu (menu);
     }
 
@@ -73,6 +75,7 @@ public class ZoomActivity extends ActionBarActivity {
             ProgressBar progressBar = new ProgressBar (context, null, android.R.attr.progressBarStyleHorizontal);
             progressBar.setPadding (5, 5, 5, 5);
             progressBar.setIndeterminate (true);
+            MenuItem menuItem = mMenu.getItem (1);
             MenuItemCompat.setActionView (menuItem, progressBar);
             MenuItemCompat.expandActionView (menuItem);
         }
@@ -84,6 +87,7 @@ public class ZoomActivity extends ActionBarActivity {
 
         @Override
         protected void onPostExecute (Bitmap result) {
+            MenuItem menuItem = mMenu.findItem (1);
             MenuItemCompat.setActionView (menuItem, R.id.refresh);
         }
 
