@@ -18,6 +18,7 @@ import android.widget.Toast;
 public class ZoomActivity extends ActionBarActivity {
     Menu mMenu;
     String url;
+    ImageView img;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -28,9 +29,9 @@ public class ZoomActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled (true);
         getSupportActionBar().setHomeButtonEnabled (true);
 
-        getSupportActionBar().setTitle ("JEN SELTER");
+        getSupportActionBar().setTitle ("Jen's Gallery");
 
-        ImageView img = new TouchImageView (this);
+        img = new TouchImageView (this);
         img.setBackgroundColor (Color.BLACK);
 
         setContentView (img);
@@ -40,7 +41,7 @@ public class ZoomActivity extends ActionBarActivity {
         url = intent.getStringExtra ("URL");
         img.setImageBitmap (MemoryCache.getBitmapFromMemoryCache (url));
 
-        //new DownloadFullImageTask(this).execute (url);
+        new DownloadFullImageTask(this).execute (url);
     }
 
     @Override
@@ -72,23 +73,32 @@ public class ZoomActivity extends ActionBarActivity {
 
         @Override
         protected void onPreExecute () {
-            ProgressBar progressBar = new ProgressBar (context, null, android.R.attr.progressBarStyleHorizontal);
+            /*ProgressBar progressBar = new ProgressBar (context, null, android.R.attr.progressBarStyleHorizontal);
             progressBar.setPadding (5, 5, 5, 5);
             progressBar.setIndeterminate (true);
             MenuItem menuItem = mMenu.getItem (1);
             MenuItemCompat.setActionView (menuItem, progressBar);
-            MenuItemCompat.expandActionView (menuItem);
+            MenuItemCompat.expandActionView (menuItem);*/
         }
 
         @Override
         protected Bitmap doInBackground (String...params) {
-            return downloadFullImage (params [0]);
+            String url = (params [0]);
+            return new DownloadManager(false).download (url);
         }
 
         @Override
         protected void onPostExecute (Bitmap result) {
-            MenuItem menuItem = mMenu.findItem (1);
-            MenuItemCompat.setActionView (menuItem, R.id.refresh);
+            if (isCancelled ()) {
+                result = null;
+            }
+
+            if (result != null) {
+                setSupportProgressBarVisibility (false);
+                img.setImageBitmap (result);
+            }
+
+            super.onPostExecute (result);
         }
 
         private Bitmap downloadFullImage (String uri) {

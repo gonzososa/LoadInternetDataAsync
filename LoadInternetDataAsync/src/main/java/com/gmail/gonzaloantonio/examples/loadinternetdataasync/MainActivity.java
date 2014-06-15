@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -14,7 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends ActionBarActivity {
     private String [] urls = {
             "https://pbs.twimg.com/profile_images/462981550003740672/Jb-UpOux.jpeg",
             "https://pbs.twimg.com/media/BoHECEXIgAEwrDi.jpg:large",
@@ -54,12 +57,16 @@ public class MainActivity extends Activity {
             "https://pbs.twimg.com/media/Bm4N-biIAAA1o57.jpg:large"
     };
 
+    private ListView listView1;
+
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_main);
 
-        final ListView listView1 = (ListView) findViewById (R.id.listView1);
+        listView1 = (ListView) findViewById (R.id.listView1);
+
+        getSupportActionBar().setTitle ("Jen's Gallery");
 
         new Runnable () {
             @Override
@@ -72,7 +79,7 @@ public class MainActivity extends Activity {
             }
         }.run ();
 
-        Button button = (Button) findViewById (R.id.button1);
+        /*Button button = (Button) findViewById (R.id.button1);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -104,7 +111,7 @@ public class MainActivity extends Activity {
                 }
             });
             }
-        });
+        });*/
 
         listView1.setOnItemClickListener (new AdapterView.OnItemClickListener () {
             @Override
@@ -112,6 +119,53 @@ public class MainActivity extends Activity {
             Intent intent = new Intent (getBaseContext(), ZoomActivity.class);
             intent.putExtra ("URL", (String) adapterView.getAdapter().getItem (i));
             startActivity (intent);
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu (Menu menu) {
+        getMenuInflater().inflate (R.menu.main_activity, menu);
+        return super.onCreateOptionsMenu (menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.load:
+                load ();
+                break;
+        }
+
+        return super.onOptionsItemSelected (item);
+    }
+
+    private void load () {
+        listView1.setAdapter (new ArrayAdapter<String>(MainActivity.this, R.id.list_item, urls) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                ImageView img;
+
+                if (convertView == null) {
+                    img = new ImageView(parent.getContext());
+                    img.setMinimumHeight (150);
+                    img.setPadding(7, 7, 7, 7);
+                } else {
+                    img = (ImageView) convertView;
+                }
+
+                String key = urls[position];
+                cancelPotentialDownload (key, img);
+                Bitmap b = getBitmapFromMemCache (key);
+                if (b != null) {
+                    img.setImageBitmap (b);
+                } else {
+                    DownloadImageTask task = new DownloadImageTask (img);
+                    img.setImageDrawable (new DefaultDrawable (task));
+                    task.execute (urls [position]);
+                }
+
+                return img;
             }
         });
     }

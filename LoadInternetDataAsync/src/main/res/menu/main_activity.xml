@@ -2,12 +2,7 @@
     <menu xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:gonzososa="http://schemas.android.com/apk/res-auto">
 
-        <item android:id="@+id/save"
-            android:orderInCategory="100"
-            gonzososa:showAsAction="ifRoom"
-            android:title="@string/zoom_activity_save" />
-
-        <item android:id="@+id/refresh"
+        <item android:id="@+id/load"
             android:orderInCategory="100"
             gonzososa:showAsAction="ifRoom"
             android:icon="@drawable/ic_action_refresh"
