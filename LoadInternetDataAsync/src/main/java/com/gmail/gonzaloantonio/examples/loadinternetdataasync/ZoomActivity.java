@@ -1,21 +1,22 @@
 package com.gmail.gonzaloantonio.examples.loadinternetdataasync;
 
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.Window;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class ZoomActivity extends ActionBarActivity {
-    private ProgressBar progressBar;
+    MenuItem menuItem;
+    String url;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -25,27 +26,24 @@ public class ZoomActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled (true);
         getSupportActionBar().setHomeButtonEnabled (true);
 
+        getSupportActionBar().setTitle ("JEN SELTER");
+
         ImageView img = new TouchImageView (this);
         img.setBackgroundColor (Color.BLACK);
 
-        progressBar = new ProgressBar (this);
-
-        supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        setSupportProgressBarIndeterminateVisibility (true);
         setContentView (img);
 
         Intent intent  = getIntent ();
-        img.setImageBitmap(MemoryCache.getBitmapFromMemoryCache(intent.getStringExtra ("URL")));
-    }
+        url = intent.getStringExtra ("URL");
+        img.setImageBitmap (MemoryCache.getBitmapFromMemoryCache (url));
 
-    @Override
-    public void onStart () {
-
+        new DownloadFullImageTask(this).execute (url);
     }
 
     @Override
     public boolean onCreateOptionsMenu (Menu menu) {
         getMenuInflater().inflate (R.menu.zoom_activity, menu);
+        menuItem = (MenuItem) findViewById (R.id.refresh);
         return super.onCreateOptionsMenu (menu);
     }
 
@@ -55,15 +53,42 @@ public class ZoomActivity extends ActionBarActivity {
             case R.id.save:
                 Toast.makeText (this, "¡Saving original image!", Toast.LENGTH_LONG).show();
                 break;
+            case R.id.refresh: {
+                break;
+            }
         }
 
         return super.onOptionsItemSelected (item);
     }
 
-    class l implements View.OnTouchListener {
+    private class DownloadFullImageTask extends AsyncTask<String, Void, Bitmap> {
+        private Context context;
+
+        public DownloadFullImageTask (Context context) {
+            this.context = context;
+        }
+
         @Override
-        public boolean onTouch (View view, MotionEvent event) {
-            return true;
+        protected void onPreExecute () {
+            ProgressBar progressBar = new ProgressBar (context, null, android.R.attr.progressBarStyleHorizontal);
+            progressBar.setPadding (5, 5, 5, 5);
+            progressBar.setIndeterminate (true);
+            MenuItemCompat.setActionView (menuItem, progressBar);
+            MenuItemCompat.expandActionView (menuItem);
+        }
+
+        @Override
+        protected Bitmap doInBackground (String...params) {
+            return downloadFullImage (params [0]);
+        }
+
+        @Override
+        protected void onPostExecute (Bitmap result) {
+            MenuItemCompat.setActionView (menuItem, R.id.refresh);
+        }
+
+        private Bitmap downloadFullImage (String uri) {
+            return null;
         }
     }
 
