@@ -13,7 +13,6 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
@@ -40,7 +39,6 @@ public class ZoomActivity extends ActionBarActivity {
         getSupportActionBar().setHomeAsUpIndicator (0);
         getSupportActionBar().setDisplayHomeAsUpEnabled (true);
         getSupportActionBar().setHomeButtonEnabled (true);
-
         getSupportActionBar().setTitle ("Jen's Gallery");
 
         img = new TouchImageView (this);
@@ -53,8 +51,8 @@ public class ZoomActivity extends ActionBarActivity {
         getWindowManager().getDefaultDisplay().getMetrics (metrics);
         screenHeight = metrics.heightPixels;
         screenWidth = metrics.widthPixels;
-        img.setMinimumHeight(screenHeight);
-        img.setMinimumWidth(screenWidth);
+        img.setMinimumHeight (screenHeight);
+        img.setMinimumWidth (screenWidth);
 
         setContentView(img);
         setSupportProgressBarIndeterminateVisibility (true);
@@ -80,6 +78,15 @@ public class ZoomActivity extends ActionBarActivity {
                 Toast.makeText (this, "¡Saving original image!", Toast.LENGTH_LONG).show();
                 break;
             case R.id.refresh: {
+                // this is unnecessary i think
+                /*try {
+                    Bitmap bitmap = ((BitmapDrawable) img.getDrawable()).getBitmap ();
+                    bitmap.recycle ();
+                }
+                catch (NullPointerException e) {}
+                catch (Exception e) {}*/
+
+                img.setImageBitmap (null);
                 task = new DownloadFullImageTask(this).execute (url);
                 break;
             }
@@ -90,19 +97,12 @@ public class ZoomActivity extends ActionBarActivity {
 
     @Override
     public void onStop () {
-        //Log.i ("JENSELTER", "Stopping activity Zoom");
         cleanup ();
         super.onStop ();
     }
 
-    public void onDestroy () {
-        //Log.i ("JENSELTER", "Destroying activity Zoom");
-        super.onDestroy ();
-    }
-
     @Override
     public void onBackPressed () {
-        //Log.i ("JENSELTER", "Back Pressed activity Zoom");
         cleanup ();
         super.onBackPressed ();
     }
@@ -112,10 +112,10 @@ public class ZoomActivity extends ActionBarActivity {
             img.destroyDrawingCache ();
 
             try {
-                BitmapDrawable drawable = ((BitmapDrawable) img.getDrawable());
+                BitmapDrawable drawable = ((BitmapDrawable) img.getDrawable ());
                 Bitmap bitmap = drawable.getBitmap ();
                 if (!bitmap.equals (MemoryCache.getBitmapFromMemoryCache (url)) // slow way
-                        && !bitmap.isMutable()) {
+                        && !bitmap.isMutable ()) {
 
                     bitmap.recycle();
                     bitmap = null;
@@ -151,13 +151,12 @@ public class ZoomActivity extends ActionBarActivity {
         protected void onPreExecute () {
             super.onPreExecute ();
 
-            ProgressBar progressBar = new ProgressBar (context, null, android.R.attr.progressBarStyleSmall);
+            ProgressBar progressBar = new ProgressBar (context, null, android.R.attr.progressBarStyle);
             progressBar.setPadding (5, 5, 5, 5);
             progressBar.setIndeterminate (true);
             MenuItem menuItem = mMenu != null ? mMenu.findItem (R.id.refresh) : null;
             if (menuItem != null) {
-                MenuItemCompat.setActionView(menuItem, progressBar);
-                //MenuItemCompat.expandActionView (menuItem);
+                MenuItemCompat.setActionView (menuItem, progressBar);
             }
         }
 
@@ -183,7 +182,6 @@ public class ZoomActivity extends ActionBarActivity {
                 MenuItem menuItem =  mMenu != null ? mMenu.findItem (R.id.refresh) : null;
                 if (menuItem != null) {
                     MenuItemCompat.setActionView (menuItem, null);
-                    //MenuItemCompat.collapseActionView (menuItem);
                 }
 
                 setSupportProgressBarIndeterminateVisibility(false);
