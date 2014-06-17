@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,6 +20,12 @@ public class DownloadManager {
 
     public DownloadManager (boolean isThumbnail) {
         this.isSampled = isThumbnail;
+    }
+
+    public DownloadManager (boolean isSampled, int width, int height) {
+        this.isSampled = isSampled;
+        //fullWidth = width;
+        //fullHeight = height;
     }
 
     public Bitmap download (String uri) {
@@ -58,9 +65,9 @@ public class DownloadManager {
 
                 Bitmap bitmap;
                 if (isSampled) {
-                    bitmap = scaleImage(BitmapFactory.decodeStream (buffer, null, options), thumbWidth, thumbHeight);
+                    bitmap = scaleImage (BitmapFactory.decodeStream (buffer, null, options), thumbWidth, thumbHeight);
                 } else {
-                    bitmap = scaleImage(BitmapFactory.decodeStream (buffer, null, options), fullWidth, fullHeight);
+                    bitmap = scaleImage (BitmapFactory.decodeStream (buffer, null, options), fullWidth, fullHeight);
                 }
 
                 return bitmap;
