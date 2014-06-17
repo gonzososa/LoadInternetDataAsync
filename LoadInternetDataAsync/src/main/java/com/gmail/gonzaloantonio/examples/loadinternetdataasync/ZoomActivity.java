@@ -22,12 +22,15 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 public class ZoomActivity extends ActionBarActivity {
+    Menu mMenu;
     String url;
     ImageView img;
 
     int screenHeight;
     int screenWidth;
     int orientation;
+
+    AsyncTask task;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -60,12 +63,13 @@ public class ZoomActivity extends ActionBarActivity {
         url = intent.getStringExtra ("URL");
         img.setImageBitmap (MemoryCache.getBitmapFromMemoryCache (url));
 
-        new DownloadFullImageTask(this).execute (url);
+        task = new DownloadFullImageTask(this).execute (url);
     }
 
     @Override
     public boolean onCreateOptionsMenu (Menu menu) {
         getMenuInflater().inflate (R.menu.zoom_activity, menu);
+        mMenu = menu;
         return super.onCreateOptionsMenu (menu);
     }
 
@@ -76,6 +80,7 @@ public class ZoomActivity extends ActionBarActivity {
                 Toast.makeText (this, "¡Saving original image!", Toast.LENGTH_LONG).show();
                 break;
             case R.id.refresh: {
+                task = new DownloadFullImageTask(this).execute (url);
                 break;
             }
         }
@@ -107,14 +112,31 @@ public class ZoomActivity extends ActionBarActivity {
             img.destroyDrawingCache ();
 
             try {
-                ((BitmapDrawable) img.getDrawable()).getBitmap().recycle ();
+                BitmapDrawable drawable = ((BitmapDrawable) img.getDrawable());
+                Bitmap bitmap = drawable.getBitmap ();
+                if (!bitmap.equals (MemoryCache.getBitmapFromMemoryCache (url)) // slow way
+                        && !bitmap.isMutable()) {
+
+                    bitmap.recycle();
+                    bitmap = null;
+                }
+                drawable = null;
             } catch (NullPointerException e) {
+
+            } catch (RuntimeException e) {
 
             } catch (Exception e) {
 
             }
 
             img = null;
+        }
+
+        if (task != null) {
+            if (task.getStatus() == AsyncTask.Status.RUNNING) {
+                task.cancel (true);
+                task = null;
+            }
         }
     }
 
@@ -129,24 +151,26 @@ public class ZoomActivity extends ActionBarActivity {
         protected void onPreExecute () {
             super.onPreExecute ();
 
-            /*ProgressBar progressBar = new ProgressBar (context, null, android.R.attr.progressBarStyleHorizontal);
+            ProgressBar progressBar = new ProgressBar (context, null, android.R.attr.progressBarStyleSmall);
             progressBar.setPadding (5, 5, 5, 5);
             progressBar.setIndeterminate (true);
-            MenuItem menuItem = mMenu.getItem (1);
-            MenuItemCompat.setActionView (menuItem, progressBar);
-            MenuItemCompat.expandActionView (menuItem);*/
+            MenuItem menuItem = mMenu != null ? mMenu.findItem (R.id.refresh) : null;
+            if (menuItem != null) {
+                MenuItemCompat.setActionView(menuItem, progressBar);
+                //MenuItemCompat.expandActionView (menuItem);
+            }
         }
 
         @Override
         protected Bitmap doInBackground (String...params) {
             String url = (params [0]);
-            if (orientation == 1) {
+            //if (orientation == 1) {
                 return new DownloadManager (false, screenWidth, screenHeight).download (url);
-            } else if (orientation == 2) {
-                return new DownloadManager (false, screenHeight, screenWidth).download (url);
-            }
+            //} else if (orientation == 2) {
+            //    return new DownloadManager (false, screenHeight, screenWidth).download (url);
+            //}
 
-            return null;
+            //return null;
         }
 
         @Override
@@ -155,7 +179,13 @@ public class ZoomActivity extends ActionBarActivity {
                 result = null;
             }
 
-            if (result != null) {
+            if (result != null && img != null) {
+                MenuItem menuItem =  mMenu != null ? mMenu.findItem (R.id.refresh) : null;
+                if (menuItem != null) {
+                    MenuItemCompat.setActionView (menuItem, null);
+                    //MenuItemCompat.collapseActionView (menuItem);
+                }
+
                 setSupportProgressBarIndeterminateVisibility(false);
                 img.setImageBitmap (result);
             }
