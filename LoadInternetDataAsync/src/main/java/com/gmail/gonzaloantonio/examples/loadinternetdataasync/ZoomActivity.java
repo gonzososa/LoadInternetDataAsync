@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -15,6 +16,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -29,21 +31,26 @@ public class ZoomActivity extends ActionBarActivity {
     int screenWidth;
     int orientation;
 
+    ProgressBar progressBar;
     AsyncTask task;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
-        supportRequestWindowFeature (Window.FEATURE_INDETERMINATE_PROGRESS);
+        setContentView (R.layout.zoom_activity);
+        //supportRequestWindowFeature (Window.FEATURE_INDETERMINATE_PROGRESS);
 
         getSupportActionBar().setHomeAsUpIndicator (0);
         getSupportActionBar().setDisplayHomeAsUpEnabled (true);
         getSupportActionBar().setHomeButtonEnabled (true);
         getSupportActionBar().setTitle ("Jen's Gallery");
 
-        img = new TouchImageView (this);
+        img = (TouchImageView) findViewById (R.id.touchView1);
+        progressBar = (ProgressBar) findViewById (R.id.progressBar1);
+        //progressBar.setIndeterminate (true);
+        /*img = new TouchImageView (this);
         img.setBackgroundColor (Color.BLACK);
-        img.setPadding (0, 0, 0, 0);
+        img.setPadding (0, 0, 0, 0);*/
 
         orientation = getResources().getConfiguration().orientation;
 
@@ -51,15 +58,15 @@ public class ZoomActivity extends ActionBarActivity {
         getWindowManager().getDefaultDisplay().getMetrics (metrics);
         screenHeight = metrics.heightPixels;
         screenWidth = metrics.widthPixels;
-        img.setMinimumHeight (screenHeight);
-        img.setMinimumWidth (screenWidth);
+        //img.setMinimumHeight (screenHeight);
+        //img.setMinimumWidth (screenWidth);
 
-        setContentView(img);
-        setSupportProgressBarIndeterminateVisibility (true);
+        //setContentView(img);
+        //setSupportProgressBarIndeterminateVisibility (true);
 
         Intent intent  = getIntent ();
         url = intent.getStringExtra ("URL");
-        img.setImageBitmap (MemoryCache.getBitmapFromMemoryCache (url));
+        //img.setImageBitmap (MemoryCache.getBitmapFromMemoryCache (url));
 
         task = new DownloadFullImageTask(this).execute (url);
     }
@@ -87,6 +94,8 @@ public class ZoomActivity extends ActionBarActivity {
                 catch (Exception e) {}*/
 
                 img.setImageBitmap (null);
+                img.setVisibility (View.GONE);
+                progressBar.setVisibility (View.VISIBLE);
                 task = new DownloadFullImageTask(this).execute (url);
                 break;
             }
@@ -114,9 +123,7 @@ public class ZoomActivity extends ActionBarActivity {
             try {
                 BitmapDrawable drawable = ((BitmapDrawable) img.getDrawable ());
                 Bitmap bitmap = drawable.getBitmap ();
-                if (!bitmap.equals (MemoryCache.getBitmapFromMemoryCache (url)) // slow way
-                        && !bitmap.isMutable ()) {
-
+                if (bitmap != null) {
                     bitmap.recycle();
                     bitmap = null;
                 }
@@ -151,13 +158,13 @@ public class ZoomActivity extends ActionBarActivity {
         protected void onPreExecute () {
             super.onPreExecute ();
 
-            ProgressBar progressBar = new ProgressBar (context, null, android.R.attr.progressBarStyle);
+            /*ProgressBar progressBar = new ProgressBar (context, null, android.R.attr.progressBarStyle);
             progressBar.setPadding (5, 5, 5, 5);
             progressBar.setIndeterminate (true);
             MenuItem menuItem = mMenu != null ? mMenu.findItem (R.id.refresh) : null;
             if (menuItem != null) {
                 MenuItemCompat.setActionView (menuItem, progressBar);
-            }
+            }*/
         }
 
         @Override
@@ -179,13 +186,15 @@ public class ZoomActivity extends ActionBarActivity {
             }
 
             if (result != null && img != null) {
-                MenuItem menuItem =  mMenu != null ? mMenu.findItem (R.id.refresh) : null;
+                /*MenuItem menuItem =  mMenu != null ? mMenu.findItem (R.id.refresh) : null;
                 if (menuItem != null) {
                     MenuItemCompat.setActionView (menuItem, null);
-                }
+                }*/
 
-                setSupportProgressBarIndeterminateVisibility(false);
+                //setSupportProgressBarIndeterminateVisibility(false);
+                progressBar.setVisibility(View.GONE);
                 img.setImageBitmap (result);
+                img.setVisibility (View.VISIBLE);
             }
 
             super.onPostExecute (result);
