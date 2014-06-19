@@ -38,7 +38,6 @@ public class ZoomActivity extends ActionBarActivity {
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.zoom_activity);
-        //supportRequestWindowFeature (Window.FEATURE_INDETERMINATE_PROGRESS);
 
         getSupportActionBar().setHomeAsUpIndicator (0);
         getSupportActionBar().setDisplayHomeAsUpEnabled (true);
@@ -47,26 +46,15 @@ public class ZoomActivity extends ActionBarActivity {
 
         img = (TouchImageView) findViewById (R.id.touchView1);
         progressBar = (ProgressBar) findViewById (R.id.progressBar1);
-        //progressBar.setIndeterminate (true);
-        /*img = new TouchImageView (this);
-        img.setBackgroundColor (Color.BLACK);
-        img.setPadding (0, 0, 0, 0);*/
-
         orientation = getResources().getConfiguration().orientation;
 
         DisplayMetrics metrics = new DisplayMetrics ();
         getWindowManager().getDefaultDisplay().getMetrics (metrics);
         screenHeight = metrics.heightPixels;
         screenWidth = metrics.widthPixels;
-        //img.setMinimumHeight (screenHeight);
-        //img.setMinimumWidth (screenWidth);
-
-        //setContentView(img);
-        //setSupportProgressBarIndeterminateVisibility (true);
 
         Intent intent  = getIntent ();
         url = intent.getStringExtra ("URL");
-        //img.setImageBitmap (MemoryCache.getBitmapFromMemoryCache (url));
 
         task = new DownloadFullImageTask(this).execute (url);
     }
@@ -124,7 +112,7 @@ public class ZoomActivity extends ActionBarActivity {
                 BitmapDrawable drawable = ((BitmapDrawable) img.getDrawable ());
                 Bitmap bitmap = drawable.getBitmap ();
                 if (bitmap != null) {
-                    bitmap.recycle();
+                    bitmap.recycle ();
                     bitmap = null;
                 }
                 drawable = null;
@@ -186,12 +174,6 @@ public class ZoomActivity extends ActionBarActivity {
             }
 
             if (result != null && img != null) {
-                /*MenuItem menuItem =  mMenu != null ? mMenu.findItem (R.id.refresh) : null;
-                if (menuItem != null) {
-                    MenuItemCompat.setActionView (menuItem, null);
-                }*/
-
-                //setSupportProgressBarIndeterminateVisibility(false);
                 progressBar.setVisibility(View.GONE);
                 img.setImageBitmap (result);
                 img.setVisibility (View.VISIBLE);
