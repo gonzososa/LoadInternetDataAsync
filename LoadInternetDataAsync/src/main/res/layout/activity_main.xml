@@ -2,26 +2,22 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center">
 
-        <!--<Button
-            android:id="@+id/button1"
-            android:layout_width="match_parent"
+        <ProgressBar
+            android:id="@+id/progressBarMain"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/button1"
-            android:layout_weight="20" />-->
+            android:indeterminate="true"
+            android:visibility="gone"
+            style="?android:attr/progressBarStyle" />
 
         <ListView
             android:id="@+id/listView1"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="80" />
-
-        <!--<ImageView
-            android:id="@+id/img"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:layout_weight="80"
-            android:background="#fff" />-->
+            android:visibility="gone" />
 
     </LinearLayout>

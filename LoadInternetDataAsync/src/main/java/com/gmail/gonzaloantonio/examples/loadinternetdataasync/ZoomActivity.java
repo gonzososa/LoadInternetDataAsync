@@ -16,6 +16,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
@@ -39,9 +40,9 @@ public class ZoomActivity extends ActionBarActivity {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.zoom_activity);
 
-        getSupportActionBar().setHomeAsUpIndicator (0);
-        getSupportActionBar().setDisplayHomeAsUpEnabled (true);
-        getSupportActionBar().setHomeButtonEnabled (true);
+        //getSupportActionBar().setHomeAsUpIndicator (0);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled (true);
+        //getSupportActionBar().setHomeButtonEnabled (true);
         getSupportActionBar().setTitle ("Jen's Gallery");
 
         img = (TouchImageView) findViewById (R.id.touchView1);
