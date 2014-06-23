@@ -17,6 +17,8 @@ public class Utils {
     public static final int IO_BUFFER_SIZE = 8 * 1024;
     public static final Object diskCacheLock = new Object ();
     public static boolean diskCacheStarting = true;
+    public static int thumbnailWidth = 0;
+    public static int thumbnailHeight = 0;
 
     public Utils () {}
 

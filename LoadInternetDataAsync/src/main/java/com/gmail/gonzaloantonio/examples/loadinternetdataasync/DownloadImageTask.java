@@ -81,11 +81,11 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
                 options.inJustDecodeBounds = true;
                 BitmapFactory.decodeStream (buffer, null, options);
                 options.inPreferredConfig = Bitmap.Config.RGB_565;
-                options.inSampleSize = calculateInSampleSize (options, 150, 150);
+                options.inSampleSize = calculateInSampleSize (options, Utils.thumbnailWidth, Utils.thumbnailHeight);
                 options.inJustDecodeBounds = false;
 
                 buffer.reset ();
-                return scaleImage (BitmapFactory.decodeStream (buffer, null, options), 150, 150);
+                return scaleImage (BitmapFactory.decodeStream (buffer, null, options), Utils.thumbnailWidth, Utils.thumbnailHeight);
             } finally {
                 if (inputStream != null) {
                     inputStream.close ();

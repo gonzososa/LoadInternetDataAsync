@@ -27,9 +27,9 @@ public class ZoomActivity extends ActionBarActivity {
     String url;
     ImageView img;
 
-    int screenHeight;
-    int screenWidth;
-    int orientation;
+    int deviceScreenHeight;
+    int deviceScreenWidth;
+    int deviceOrientation;
 
     ProgressBar progressBar;
     AsyncTask task;
@@ -46,12 +46,12 @@ public class ZoomActivity extends ActionBarActivity {
 
         img = (TouchImageView) findViewById (R.id.touchView1);
         progressBar = (ProgressBar) findViewById (R.id.progressBar1);
-        orientation = getResources().getConfiguration().orientation;
+        deviceOrientation = getResources().getConfiguration().orientation;
 
         DisplayMetrics metrics = new DisplayMetrics ();
         getWindowManager().getDefaultDisplay().getMetrics (metrics);
-        screenHeight = metrics.heightPixels;
-        screenWidth = metrics.widthPixels;
+        deviceScreenHeight = metrics.heightPixels;
+        deviceScreenWidth = metrics.widthPixels;
 
         Intent intent  = getIntent ();
         url = intent.getStringExtra ("URL");
@@ -159,7 +159,7 @@ public class ZoomActivity extends ActionBarActivity {
         protected Bitmap doInBackground (String...params) {
             String url = (params [0]);
 
-            int lado_mayor_dispositivo = screenWidth > screenHeight ? screenWidth : screenHeight;
+            int lado_mayor_dispositivo = deviceScreenWidth > deviceScreenHeight ? deviceScreenWidth : deviceScreenHeight;
             int BUFFER_SIZE = 16 * 1024;
             int orientation = -1;
 

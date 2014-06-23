@@ -6,7 +6,8 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,13 +17,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,6 +38,17 @@ public class MainActivity extends ActionBarActivity {
 
         listView1 = (ListView) findViewById (R.id.listView1);
         progressBarMain = (ProgressBar) findViewById (R.id.progressBarMain);
+
+        DisplayMetrics metrics = new DisplayMetrics ();
+        getWindowManager().getDefaultDisplay().getMetrics (metrics);
+        int deviceScreenHeight = metrics.heightPixels;
+        if  (deviceScreenHeight < 480) {
+            Utils.thumbnailHeight = 150;
+            Utils.thumbnailWidth = 150;
+        } else {
+            Utils.thumbnailHeight = 250;
+            Utils.thumbnailWidth = 250;
+        }
 
         getSupportActionBar().setTitle ("Jen's Gallery");
 
@@ -78,9 +83,8 @@ public class MainActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected (MenuItem item) {
         switch (item.getItemId()) {
             case R.id.load: {
-                //load ();
                 progressBarMain.setVisibility (View.VISIBLE);
-                new DownloadURLTask().execute ("https://dl.dropboxusercontent.com/u/52679306/jen.txt");
+                new DownloadLinksTask().execute("https://dl.dropboxusercontent.com/u/52679306/jen.txt");
                 break;
             }
         }
@@ -96,7 +100,7 @@ public class MainActivity extends ActionBarActivity {
 
                 if (convertView == null) {
                     img = new ImageView(parent.getContext());
-                    img.setMinimumHeight (150);
+                    img.setMinimumHeight (Utils.thumbnailHeight);
                     img.setPadding(7, 7, 7, 7);
                 } else {
                     img = (ImageView) convertView;
@@ -148,7 +152,7 @@ public class MainActivity extends ActionBarActivity {
         return MemoryCache.getBitmapFromMemoryCache (key);
     }
 
-    class DownloadURLTask extends AsyncTask<String, Void, String []> {
+    class DownloadLinksTask extends AsyncTask<String, Void, String []> {
         @Override
         public String [] doInBackground (String...params) {
             return download (params [0]);
