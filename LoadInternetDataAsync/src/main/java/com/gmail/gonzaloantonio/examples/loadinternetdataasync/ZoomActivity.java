@@ -1,5 +1,6 @@
 package com.gmail.gonzaloantonio.examples.loadinternetdataasync;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -7,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
 import android.view.Menu;
@@ -70,10 +72,10 @@ public class ZoomActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected (MenuItem item) {
         switch (item.getItemId ()) {
             case R.id.save:
-                Toast.makeText (this, "¡Saving original image!", Toast.LENGTH_LONG).show();
+                new SaveOriginalImageTask(this).execute();
                 break;
             case R.id.refresh: {
-                // this is unnecessary i think
+                // this is unnecessary, i think
                 /*try {
                     Bitmap bitmap = ((BitmapDrawable) img.getDrawable()).getBitmap ();
                     bitmap.recycle ();
@@ -277,4 +279,47 @@ public class ZoomActivity extends ActionBarActivity {
         }
     }
 
+    ProgressDialog dialog;
+
+    private class SaveOriginalImageTask extends AsyncTask<Void, Void, Void> {
+        private Context context;
+
+        public SaveOriginalImageTask (Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected void onPreExecute () {
+            dialog = new ProgressDialog (context);
+            dialog.setTitle ("Saving...");
+            dialog.setMessage ("Please wait.");
+            dialog.setCancelable (false);
+            dialog.setIndeterminate (true);
+            dialog.show ();
+        }
+
+        @Override
+        protected Void doInBackground (Void...params) {
+            try {
+                Thread.sleep (3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace ();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute (Void result) {
+            if (dialog != null) {
+                dialog.dismiss ();
+                dialog = null;
+
+                if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                    String ruta = Environment.getExternalStorageDirectory().getPath();
+                    ruta += "/Download/JenSelter/";
+                    Toast.makeText (context, "Image saved in: " + ruta, Toast.LENGTH_LONG).show ();
+                }
+            }
+        }
+    }
 }
