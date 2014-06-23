@@ -2,6 +2,7 @@ package com.gmail.gonzaloantonio.examples.loadinternetdataasync;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -12,6 +13,36 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class DownloadManager {
+    public InputStream download (String uri) {
+        URL url;
+        HttpURLConnection client = null;
+
+        try {
+            url = new URL(uri);
+            client = (HttpURLConnection) url.openConnection();
+            final int statusCode = client.getResponseCode();
+
+            if (statusCode != HttpURLConnection.HTTP_OK) {
+                return null;
+            }
+
+            return client.getInputStream ();
+        } catch (MalformedURLException e) {
+
+        } catch (IOException e) {
+
+        } finally {
+            if (client != null) {
+                client.disconnect ();
+            }
+        }
+
+        return null;
+    }
+
+}
+
+/*public class DownloadManager {
     boolean isSampled;
     final int thumbWidth = 150;
     final int thumbHeight = 150;
@@ -121,4 +152,4 @@ public class DownloadManager {
         bitmap = null;
         return b;
     }
-}
+}*/

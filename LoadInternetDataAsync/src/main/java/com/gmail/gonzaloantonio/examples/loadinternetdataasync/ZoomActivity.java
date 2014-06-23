@@ -3,25 +3,24 @@ package com.gmail.gonzaloantonio.examples.loadinternetdataasync;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.PointF;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class ZoomActivity extends ActionBarActivity {
     Menu mMenu;
@@ -159,13 +158,90 @@ public class ZoomActivity extends ActionBarActivity {
         @Override
         protected Bitmap doInBackground (String...params) {
             String url = (params [0]);
-            //if (orientation == 1) {
-                return new DownloadManager (false, screenWidth, screenHeight).download (url);
-            //} else if (orientation == 2) {
-            //    return new DownloadManager (false, screenHeight, screenWidth).download (url);
-            //}
 
-            //return null;
+            int lado_mayor_dispositivo = screenWidth > screenHeight ? screenWidth : screenHeight;
+            int BUFFER_SIZE = 16 * 1024;
+            int orientation = -1;
+
+            HttpURLConnection client;
+            BufferedInputStream buffer;
+
+            try {
+                client = (HttpURLConnection) new URL (url).openConnection ();
+
+                if (client.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    return null;
+                }
+
+                buffer = new BufferedInputStream (new FlushedInputStream (client.getInputStream ()), BUFFER_SIZE);
+                buffer.mark (BUFFER_SIZE);
+
+                BitmapFactory.Options options = new BitmapFactory.Options ();
+                options.inPreferredConfig = Bitmap.Config.RGB_565;
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeStream (buffer, null, options);
+
+                int ancho_imagen_original = options.outWidth;
+                int largo_imagen_original = options.outHeight;
+
+                int lado_mayor_imagen_original;
+                if (ancho_imagen_original > largo_imagen_original) {
+                    lado_mayor_imagen_original = ancho_imagen_original;
+                    orientation = 0; // LANDSCAPE
+                } else if (largo_imagen_original > ancho_imagen_original) {
+                    lado_mayor_imagen_original = largo_imagen_original;
+                    orientation = 1; // PORTRAIT
+                } else {
+                    lado_mayor_imagen_original = ancho_imagen_original; // SQUARE
+                }
+
+                final int BASE_SCALAR;
+                if ((lado_mayor_imagen_original / 2) < lado_mayor_dispositivo) {
+                    BASE_SCALAR = lado_mayor_dispositivo;
+                } else {
+                    BASE_SCALAR = lado_mayor_imagen_original / 2;
+                }
+
+                int ancho_imagen_escalada = 0;
+                int largo_imagen_escalada = 0;
+                switch (orientation) {
+                    case -1:
+                        ancho_imagen_escalada = BASE_SCALAR;
+                        largo_imagen_escalada = BASE_SCALAR;
+                        break;
+                    case 0:
+                        ancho_imagen_escalada = BASE_SCALAR;
+                        float foo = ((float) largo_imagen_original / (float) ancho_imagen_original) * BASE_SCALAR;
+                        largo_imagen_escalada = (int) foo;
+                        break;
+                    case 1:
+                        largo_imagen_escalada = BASE_SCALAR;
+                        float bar = ((float) ancho_imagen_original / (float) largo_imagen_original) * BASE_SCALAR;
+                        ancho_imagen_escalada = (int) bar;
+                        break;
+                }
+
+                options.inSampleSize = calculateInSampleSize (options, ancho_imagen_escalada, largo_imagen_escalada);
+                options.inJustDecodeBounds = false;
+                buffer.reset();
+
+                Bitmap bitmap = BitmapFactory.decodeStream (buffer, null, options);
+                Bitmap scaledBitmap = Bitmap.createScaledBitmap (bitmap, ancho_imagen_escalada, largo_imagen_escalada, true);
+
+                bitmap.recycle ();
+                buffer.close ();
+                client.disconnect ();
+
+                return scaledBitmap;
+            } catch (MalformedURLException e) {
+
+            } catch (IOException e) {
+
+            } catch (NullPointerException e) {
+
+            }
+
+            return null;
         }
 
         @Override
@@ -181,6 +257,23 @@ public class ZoomActivity extends ActionBarActivity {
             }
 
             super.onPostExecute (result);
+        }
+
+        private int calculateInSampleSize (BitmapFactory.Options options, int reqWidth, int reqHeight) {
+            final int height = options.outHeight;
+            final int width = options.outWidth;
+            int inSampleSize = 1;
+
+            if (height > reqHeight || width > reqWidth) {
+                final int halfHeight = height / 2;
+                final int halfWidth = width / 2;
+
+                while (((halfHeight / inSampleSize) > reqHeight) && ((halfWidth / inSampleSize) > reqWidth)) {
+                    inSampleSize *= 2;
+                }
+            }
+
+            return inSampleSize;
         }
     }
 
