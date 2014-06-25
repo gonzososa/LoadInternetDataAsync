@@ -27,7 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity {
-     private String [] urls;
+    private String [] urls;
     private ListView listView1;
     private ProgressBar progressBarMain;
 
@@ -52,25 +52,42 @@ public class MainActivity extends ActionBarActivity {
 
         getSupportActionBar().setTitle ("Jen's Gallery");
 
-        new Runnable () {
-            @Override
-            public void run () {
-                synchronized (Utils.diskCacheLock) {
-                    Utils.diskCache = new DiskLRUCacheWrapper (getBaseContext (), Utils.UniqueName, Utils.SizeOfCache);
-                    Utils.diskCacheStarting = false;
-                    Utils.diskCacheLock.notifyAll ();
+        if (savedInstanceState == null) {
+            new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (Utils.diskCacheLock) {
+                        Utils.diskCache = new DiskLRUCacheWrapper(getBaseContext(), Utils.UniqueName, Utils.SizeOfCache);
+                        Utils.diskCacheStarting = false;
+                        Utils.diskCacheLock.notifyAll();
+                    }
                 }
-            }
-        }.run ();
+            }.run();
+        }
 
-        listView1.setOnItemClickListener (new AdapterView.OnItemClickListener () {
+        listView1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent (getBaseContext(), ZoomActivity.class);
-                intent.putExtra ("URL", (String) adapterView.getAdapter().getItem (i));
-                startActivity (intent);
+                Intent intent = new Intent(getBaseContext(), ZoomActivity.class);
+                intent.putExtra("URL", (String) adapterView.getAdapter().getItem(i));
+                startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onSaveInstanceState (Bundle savedInstanceState) {
+        super.onSaveInstanceState (savedInstanceState);
+        savedInstanceState.putStringArray ("URLJENSELTER", urls);
+    }
+
+    @Override
+    public void onRestoreInstanceState (Bundle savedInstanceState) {
+        super.onRestoreInstanceState (savedInstanceState);
+        progressBarMain.setVisibility (View.GONE);
+        listView1.setVisibility (View.VISIBLE);
+        urls = savedInstanceState.getStringArray ("URLJENSELTER");
+        load ();
     }
 
     @Override
@@ -95,13 +112,13 @@ public class MainActivity extends ActionBarActivity {
     private void load () {
         listView1.setAdapter (new ArrayAdapter<String>(MainActivity.this, R.id.list_item, urls) {
             @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
+            public View getView (int position, View convertView, ViewGroup parent) {
                 ImageView img;
 
                 if (convertView == null) {
-                    img = new ImageView(parent.getContext());
+                    img = new ImageView (parent.getContext ());
                     img.setMinimumHeight (Utils.thumbnailHeight);
-                    img.setPadding(7, 7, 7, 7);
+                    img.setPadding (7, 7, 7, 7);
                 } else {
                     img = (ImageView) convertView;
                 }

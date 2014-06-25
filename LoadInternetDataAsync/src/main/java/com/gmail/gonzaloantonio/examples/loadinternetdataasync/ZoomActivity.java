@@ -60,8 +60,8 @@ public class ZoomActivity extends ActionBarActivity {
         setContentView (R.layout.zoom_activity);
 
         //getSupportActionBar().setHomeAsUpIndicator (0);
-        //getSupportActionBar().setDisplayHomeAsUpEnabled (true);
-        //getSupportActionBar().setHomeButtonEnabled (true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled (false);
+        getSupportActionBar().setHomeButtonEnabled (false);
         getSupportActionBar().setTitle ("Jen's Gallery");
 
         img = (TouchImageView) findViewById (R.id.touchView1);
@@ -77,9 +77,9 @@ public class ZoomActivity extends ActionBarActivity {
         Intent intent  = getIntent ();
         url = intent.getStringExtra ("URL");
 
-//        if (savedInstanceState == null) {
+        if (savedInstanceState == null || MemoryCache.fullSizeImage == null) {
             task = new DownloadFullImageTask(this).execute (url);
-//        } else {
+        } else if (MemoryCache.fullSizeImage != null) {
             /*try {
                 String path = Environment.getExternalStoragePublicDirectory (Environment.DIRECTORY_PICTURES).getPath ();
                 File file = new File (path, "temp.jpg");
@@ -97,18 +97,17 @@ public class ZoomActivity extends ActionBarActivity {
                 Log.i ("JENSELTER", "Error IOEX: " + e.getMessage());
             }*/
 
-            /*if (MemoryCache.fullSizeImage != null) {
-                byte [] bitmapBytes = MemoryCache.fullSizeImage.toByteArray ();
-                Bitmap bitmap = BitmapFactory.decodeByteArray (bitmapBytes, 0,bitmapBytes.length);
-                img.setImageBitmap (bitmap);
-            }*/
-//        }
+            progressBar.setVisibility (View.GONE);
+            img.setVisibility (View.VISIBLE);
+            byte [] bitmapBytes = MemoryCache.fullSizeImage.toByteArray ();
+            Bitmap bitmap = BitmapFactory.decodeByteArray (bitmapBytes, 0,bitmapBytes.length);
+            img.setImageBitmap (bitmap);
+        }
     }
 
     @Override
     public void onConfigurationChanged (Configuration newConfig) {
         super.onConfigurationChanged (newConfig);
-        Log.i("JENSELTER", "Orientation: " + newConfig.orientation);
     }
 
     protected void onSaveInstanceState (Bundle outState) {
@@ -118,7 +117,6 @@ public class ZoomActivity extends ActionBarActivity {
     @Override
     protected void onRestoreInstanceState (Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.i("JENSELTER", "Restore");
     }
 
     @Override
@@ -146,6 +144,7 @@ public class ZoomActivity extends ActionBarActivity {
                 img.setImageBitmap (null);
                 img.setVisibility (View.GONE);
                 progressBar.setVisibility (View.VISIBLE);
+                MemoryCache.fullSizeImage = null;
                 task = new DownloadFullImageTask(this).execute (url);
                 break;
             }
@@ -156,7 +155,6 @@ public class ZoomActivity extends ActionBarActivity {
 
     @Override
     public void onDestroy () {
-        Log.i ("JENSELTER", "Destroying zoom activity");
         super.onDestroy ();
     }
 
@@ -230,60 +228,44 @@ public class ZoomActivity extends ActionBarActivity {
             String url = (params [0]);
 
             int lado_mayor_dispositivo = deviceScreenWidth > deviceScreenHeight ? deviceScreenWidth : deviceScreenHeight;
-            int BUFFER_SIZE = 16 * 1024;
+            //int BUFFER_SIZE = 16 * 1024;
             int orientation = -1;
 
             HttpURLConnection client;
-            BufferedInputStream buffer;
+            //BufferedInputStream buffer;
 
             try {
                 client = (HttpURLConnection) new URL (url).openConnection ();
 
-//                if (MemoryCache.fullSizeImage == null) {
-                    if (client.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                        return null;
-                    }
+                if (client.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    return null;
+                }
 
-                    buffer = new BufferedInputStream (new FlushedInputStream (client.getInputStream ()), BUFFER_SIZE);
-                    buffer.mark (BUFFER_SIZE);
+                ByteArrayOutputStream bos = new ByteArrayOutputStream ();
+                InputStream inputStream = client.getInputStream ();
+                byte [] buf = new byte [1024 * 4];
+                int i;
+                while ((i = inputStream.read (buf)) != -1) {
+                    bos.write (buf, 0, i);
+                }
+                inputStream.close ();
+                client.disconnect ();
 
-//                    MemoryCache.fullSizeImage = new ByteArrayOutputStream ();
-//                    int b;
-//                    while ((b = buffer.read ()) != -1) {
-//                        MemoryCache.fullSizeImage.write (b);
-//                    }
-//
-//                    MemoryCache.fullSizeImage.flush ();
-//                    buffer.reset ();
-//                    Log.i ("JENSELTER", "Buffer reset");
-//                    MemoryCache.fullSizeImage = new ByteArrayOutputStream ();
-//                    InputStream inputStream = client.getInputStream();
+                byte [] bitmapBytes = bos.toByteArray ();
+                MemoryCache.fullSizeImage = bos;
+                bos = null;
 
-//                    int b;
-//
-//                    while ((b = inputStream.read ()) > -1) {
-//                        MemoryCache.fullSizeImage.write (b);
-//                    }
-//
-//                    inputStream.close ();
-//                } else {
-//                    byte [] cacheBytes = MemoryCache.fullSizeImage.toByteArray ();
-//                    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream (cacheBytes);
-//                    buffer = new BufferedInputStream (byteArrayInputStream, BUFFER_SIZE);
-//                    buffer.mark (BUFFER_SIZE);
-//                }
+                //buffer = new BufferedInputStream (new FlushedInputStream (client.getInputStream ()), BUFFER_SIZE);
+                //buffer.mark (BUFFER_SIZE);
 
                 BitmapFactory.Options options = new BitmapFactory.Options ();
                 options.inPreferredConfig = Bitmap.Config.RGB_565;
                 options.inJustDecodeBounds = true;
-//                byte[] memArray = MemoryCache.fullSizeImage.toByteArray ();
-//                BitmapFactory.decodeByteArray (memArray, 0, memArray.length, options);
-                BitmapFactory.decodeStream (buffer, null, options);
-//                Log.i ("JENSELTER", "Byte array decoded");
+                //BitmapFactory.decodeStream (buffer, null, options);
+                BitmapFactory.decodeByteArray (bitmapBytes, 0, bitmapBytes.length, options);
+
                 int ancho_imagen_original = options.outWidth;
                 int largo_imagen_original = options.outHeight;
-//                Log.i ("JENSELTER", "Ancho original: " + ancho_imagen_original);
-//                Log.i ("JENSELTER", "Alto original: " + largo_imagen_original);
 
                 int lado_mayor_imagen_original;
                 if (ancho_imagen_original > largo_imagen_original) {
@@ -322,22 +304,17 @@ public class ZoomActivity extends ActionBarActivity {
                         break;
                 }
 
-//                Log.i ("JENSELTER", "Ancho escalado: " + ancho_imagen_escalada);
-//                Log.i ("JENSELTER", "Alto escalado: " + largo_imagen_escalada);
-
                 options.inSampleSize = calculateInSampleSize (options, ancho_imagen_escalada, largo_imagen_escalada);
                 options.inJustDecodeBounds = false;
-                buffer.reset();
-//              MemoryCache.fullSizeImage.reset ();
+                //buffer.reset();
 
-                Bitmap bitmap = BitmapFactory.decodeStream (buffer, null, options);
-//              Bitmap bitmap = BitmapFactory.decodeByteArray (memArray, 0, memArray.length, options);
+                //Bitmap bitmap = BitmapFactory.decodeStream (buffer, null, options);
+                Bitmap bitmap = BitmapFactory.decodeByteArray (bitmapBytes, 0, bitmapBytes.length, options);
                 Bitmap scaledBitmap = Bitmap.createScaledBitmap (bitmap, ancho_imagen_escalada, largo_imagen_escalada, true);
-
                 bitmap.recycle ();
-                buffer.close ();
-//              MemoryCache.fullSizeImage.reset ();
-                client.disconnect ();
+
+                //buffer.close ();
+                //client.disconnect ();
 
                 /*try {
                     File path = Environment.getExternalStoragePublicDirectory (Environment.DIRECTORY_PICTURES);

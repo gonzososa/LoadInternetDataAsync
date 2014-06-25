@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -64,7 +65,49 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
             HttpURLConnection client = (HttpURLConnection) url.openConnection ();
             final int statusCode = client.getResponseCode ();
 
-            if (statusCode != 200) {
+            if (statusCode != HttpURLConnection.HTTP_OK) {
+                return null;
+            }
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream ();
+            byte [] bitmapBytes = new byte [1024 * 4];
+            InputStream inputStream = client.getInputStream ();
+            int i;
+
+            while ((i = inputStream.read (bitmapBytes)) != -1) {
+                bos.write (bitmapBytes, 0, i);
+            }
+
+            byte[] buffer = bos.toByteArray ();
+            inputStream.close ();
+            inputStream = null;
+            bos.close ();
+            bos = null;
+
+            BitmapFactory.Options options = new BitmapFactory.Options ();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeByteArray (buffer, 0, buffer.length, options);
+            options.inPreferredConfig = Bitmap.Config.RGB_565;
+            options.inSampleSize = calculateInSampleSize (options, Utils.thumbnailWidth, Utils.thumbnailHeight);
+            options.inJustDecodeBounds = false;
+
+            return scaleImage (BitmapFactory.decodeByteArray (buffer, 0, buffer.length, options), Utils.thumbnailWidth, Utils.thumbnailHeight);
+        } catch (MalformedURLException e) {
+
+        } catch (IOException e) {
+
+        }
+
+        return null;
+    }
+
+/*    private Bitmap downloadBitmap (String uri) {
+        try {
+            URL url = new URL (uri);
+            HttpURLConnection client = (HttpURLConnection) url.openConnection ();
+            final int statusCode = client.getResponseCode ();
+
+            if (statusCode != HttpURLConnection.HTTP_OK) {
                 return null;
             }
 
@@ -103,7 +146,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         }
 
         return null;
-    }
+    }*/
 
     private int calculateInSampleSize (BitmapFactory.Options options, int reqWidth, int reqHeight) {
         final int height = options.outHeight;
