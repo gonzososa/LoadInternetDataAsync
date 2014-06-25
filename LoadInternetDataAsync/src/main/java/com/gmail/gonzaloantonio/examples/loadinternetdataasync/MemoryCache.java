@@ -3,12 +3,16 @@ package com.gmail.gonzaloantonio.examples.loadinternetdataasync;
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
 
+import java.io.ByteArrayOutputStream;
+
 public class MemoryCache {
+    public static ByteArrayOutputStream fullSizeImage = null;
     private static final LruCache<String, Bitmap> memCache;
 
     static {
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         final int cacheSize = maxMemory / 8;
+
         memCache = new LruCache<String, Bitmap>(cacheSize) {
             @Override
             protected int sizeOf (String key, Bitmap value) {

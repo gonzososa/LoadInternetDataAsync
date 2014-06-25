@@ -84,7 +84,7 @@ public class MainActivity extends ActionBarActivity {
         switch (item.getItemId()) {
             case R.id.load: {
                 progressBarMain.setVisibility (View.VISIBLE);
-                new DownloadLinksTask().execute("https://dl.dropboxusercontent.com/u/52679306/jen.txt");
+                new DownloadLinksTask().execute ("https://dl.dropboxusercontent.com/u/52679306/jen.txt");
                 break;
             }
         }
