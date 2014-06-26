@@ -10,9 +10,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,25 +20,12 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import org.apache.http.util.ByteArrayBuffer;
-
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.io.StreamCorruptedException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.ByteBuffer;
 
 public class ZoomActivity extends ActionBarActivity {
     Menu mMenu;
@@ -59,15 +46,12 @@ public class ZoomActivity extends ActionBarActivity {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.zoom_activity);
 
-        //getSupportActionBar().setHomeAsUpIndicator (0);
-        getSupportActionBar().setDisplayHomeAsUpEnabled (false);
-        getSupportActionBar().setHomeButtonEnabled (false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled (true);
         getSupportActionBar().setTitle ("Jen's Gallery");
 
         img = (TouchImageView) findViewById (R.id.touchView1);
         progressBar = (ProgressBar) findViewById (R.id.progressBar1);
         deviceOrientation = getResources().getConfiguration().orientation;
-        //serializator = new SerializeBitmap ();
 
         DisplayMetrics metrics = new DisplayMetrics ();
         getWindowManager().getDefaultDisplay().getMetrics (metrics);
@@ -129,6 +113,11 @@ public class ZoomActivity extends ActionBarActivity {
     @Override
     public boolean onOptionsItemSelected (MenuItem item) {
         switch (item.getItemId ()) {
+            case android.R.id.home:
+                Intent intent = NavUtils.getParentActivityIntent(this);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                NavUtils.navigateUpTo (this, intent);
+                return true;
             case R.id.save:
                 new SaveOriginalImageTask(this).execute ();
                 break;
@@ -331,11 +320,11 @@ public class ZoomActivity extends ActionBarActivity {
 
                 return scaledBitmap;
             } catch (MalformedURLException e) {
-                Log.i ("JENSELTER", "Error MFEX: " + e.getMessage ());
+
             } catch (IOException e) {
-                Log.i ("JENSELTER", "Error IOEX: " + e.getMessage ());
+
             } catch (NullPointerException e) {
-                Log.i ("JENSELTER", "Error NPEX: " + e.getMessage ());
+
             }
 
             return null;

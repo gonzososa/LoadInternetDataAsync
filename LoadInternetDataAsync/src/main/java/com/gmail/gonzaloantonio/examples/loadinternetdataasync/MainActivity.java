@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -78,7 +77,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onSaveInstanceState (Bundle savedInstanceState) {
         super.onSaveInstanceState (savedInstanceState);
-        savedInstanceState.putStringArray ("URLJENSELTER", urls);
+        savedInstanceState.putStringArray("URLJENSELTER", urls);
     }
 
     @Override
@@ -106,32 +105,32 @@ public class MainActivity extends ActionBarActivity {
             }
         }
 
-        return super.onOptionsItemSelected (item);
+        return super.onOptionsItemSelected(item);
     }
 
     private void load () {
-        listView1.setAdapter (new ArrayAdapter<String>(MainActivity.this, R.id.list_item, urls) {
+        listView1.setAdapter(new ArrayAdapter<String>(MainActivity.this, R.id.list_item, urls) {
             @Override
-            public View getView (int position, View convertView, ViewGroup parent) {
+            public View getView(int position, View convertView, ViewGroup parent) {
                 ImageView img;
 
                 if (convertView == null) {
-                    img = new ImageView (parent.getContext ());
-                    img.setMinimumHeight (Utils.thumbnailHeight);
-                    img.setPadding (7, 7, 7, 7);
+                    img = new ImageView(parent.getContext());
+                    img.setMinimumHeight(Utils.thumbnailHeight);
+                    img.setPadding(7, 7, 7, 7);
                 } else {
                     img = (ImageView) convertView;
                 }
 
-                String key = urls [position];
-                cancelPotentialDownload (key, img);
-                Bitmap b = getBitmapFromMemCache (key);
+                String key = urls[position];
+                cancelPotentialDownload(key, img);
+                Bitmap b = getBitmapFromMemCache(key);
                 if (b != null) {
-                    img.setImageBitmap (b);
+                    img.setImageBitmap(b);
                 } else {
-                    DownloadImageTask task = new DownloadImageTask (img);
-                    img.setImageDrawable (new DefaultDrawable (task));
-                    task.execute (urls [position]);
+                    DownloadImageTask task = new DownloadImageTask(img);
+                    img.setImageDrawable(new DefaultDrawable(task));
+                    task.execute(urls[position]);
                 }
 
                 return img;
@@ -166,7 +165,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public Bitmap getBitmapFromMemCache (String key)  {
-        return MemoryCache.getBitmapFromMemoryCache (key);
+        return MemoryCache.getBitmapFromMemoryCache(key);
     }
 
     class DownloadLinksTask extends AsyncTask<String, Void, String []> {
