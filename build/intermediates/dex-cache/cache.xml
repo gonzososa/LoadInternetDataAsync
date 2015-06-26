@@ -1,29 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<pre-dex-items>
+<items version="2" >
 
     <item
-        dex="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\pre-dexed\debug\support-v4-19.1.0-72aac739eb325ff30f32259efecb3d01c8b45ccd.jar"
-        jar="C:\Users\Gonzalo\AppData\Local\Android\android-studio\sdk\extras\android\m2repository\com\android\support\support-v4\19.1.0\support-v4-19.1.0.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67"/>
-    <item
-        dex="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\pre-dexed\debug\disklrucache-2.0.2-c8d0a55298744b9f19fc9f0b4d1daf60921221c8.jar"
-        jar="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\libs\disklrucache-2.0.2.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="93b399470e72c0bc8cb52379943b63c9aa586cd8"/>
-    <item
-        dex="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\pre-dexed\debug\classes-9eb682b9e8180ebc55333babc1e1209291e97856.jar"
-        jar="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\build\intermediates\exploded-aar\com.android.support\appcompat-v7\19.1.0\classes.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="3499ceba05ca1f6037c6a2fad73df8f636224a28"/>
-    <item
-        dex="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\pre-dexed\debug\commons-io-2.4-65e100933fca7e113a94347a299548b4fb6e8c6b.jar"
         jar="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\libs\commons-io-2.4.jar"
         jumboMode="false"
-        revision="19.1.0"
-        sha1="b1b6ea3b7e4aa4f492509a4952029cd8e48019ad"/>
+        revision="22.0.1"
+        sha1="b1b6ea3b7e4aa4f492509a4952029cd8e48019ad">
+        <dex dex="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\pre-dexed\debug\commons-io-2.4-65e100933fca7e113a94347a299548b4fb6e8c6b.jar" />
+    </item>
+    <item
+        jar="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\jars\libs\internal_impl-22.2.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
+        <dex dex="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\pre-dexed\debug\internal_impl-22.2.0-62c309a324709241fdefcd23c694cee262c8172a.jar" />
+    </item>
+    <item
+        jar="C:\Users\Gonzalo\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\22.2.0\support-annotations-22.2.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
+        <dex dex="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\pre-dexed\debug\support-annotations-22.2.0-7efb01ca0f75f98c06b7ad6b02ca7136b9787fda.jar" />
+    </item>
+    <item
+        jar="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\jars\classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="1ee588ff2c4daf7b97c1cbf922a6c7f027285c2f">
+        <dex dex="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\pre-dexed\debug\classes-9c5b88b103b74b1c3d138c9d7e6fa4fea4750ae8.jar" />
+    </item>
+    <item
+        jar="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\libs\disklrucache-2.0.2.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="93b399470e72c0bc8cb52379943b63c9aa586cd8">
+        <dex dex="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\pre-dexed\debug\disklrucache-2.0.2-c8d0a55298744b9f19fc9f0b4d1daf60921221c8.jar" />
+    </item>
+    <item
+        jar="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\exploded-aar\com.android.support\appcompat-v7\22.2.0\jars\classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
+        <dex dex="C:\Users\Gonzalo\Documents\GitHub\LoadInternetDataAsync\LoadInternetDataAsync\build\intermediates\pre-dexed\debug\classes-14777cd02ee9faba49828bc98d8615b500fb84b1.jar" />
+    </item>
 
-</pre-dex-items>
+</items>
